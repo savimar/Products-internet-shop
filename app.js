@@ -59,35 +59,20 @@ function serveStatic (req, res, pathname) {
 function serveIndex (req, res, path) {
   console.log('serveIndex');
 
-  const data = {
-    product: {
-      title: products[0].title,
-      imageURL: products[0].img,
-      description: products[0].description,
-      descriptionFull: products[0].descriptionFull,
-      price: products[0].price,
-    }
+  const scope = {
+    products: products
   };
 
   try {
- /*   const content = fs.readFileSync(path).toString();
-    let template = ejs.compile(content);
-    const product = template(data);*/
 
    let product;
-     ejs.renderFile(path,data, function (err, html) {
+     ejs.renderFile(path, scope, function (err, html) {
      if (err) {
        console.log("ERROR: " + err);
        return false;
      }
      product = html.toString();
-     /*fs.writeFile(path + '.html', html, function (err) {
-       if (err) {
-         console.log(err);
-         return false;
-       }
-       return true;
-     });*/
+
    });
     res.writeHead(200, {
       'Content-Type': 'text/html; charset=utf-8'

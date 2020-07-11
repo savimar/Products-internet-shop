@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,16 +11,19 @@
 <body>
 <%- include("partials/menu.ejs") %>
 <main>
-      <div class="container">
-        <div class="card mb-3">
-            <div class="content">
-                <img class="card-img-top" alt="img" src='<%= product.imageURL %>'/>
-                <h5 class="card-title"><%=product.title %></h5>
-                <p class="card-text"><%=product.description%></p>
-                <p class="card-text"> Цена <%=product.price%> руб.</p>
-                <a href="/product" class="btn btn-primary">Купить</a>
+    <div class="container">
+        <% for (let i = 0; i < products.length; i++) { %>
+            <% let product = products[i]; %>
+            <div class="card mb-3">
+                <div class="content">
+                    <img class="card-img-top" alt="img" src='<%= product.img %>'/>
+                    <h5 class="card-title"><%= product.title %></h5>
+                    <p class="card-text"><%= product.description %></p>
+                    <p class="card-text"> Цена <%= product.price %> руб.</p>
+                    <a href="/product" class="btn btn-primary">Купить</a>
+                </div>
             </div>
-        </div>
+        <% } %>
     </div>
 
 </main>

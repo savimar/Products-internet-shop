@@ -16,6 +16,13 @@ module.exports = {
       descriptionFull: "Полное описание второго товара",
       price: 1500
     });
+    products.push({
+      title: "Товар 3",
+      img: "https://i.ibb.co/Js1JZYs/product3.jpg",
+      description: "Краткое описание третьего товара",
+      descriptionFull: "Полное описание третьего товара",
+      price: 2000
+    });
   },
 
   getProducts() {
