@@ -20,21 +20,21 @@
 <main>
     <div class="box">
         <div class="content">
-            <img class="img" src="img/product1.jpg"
-            alt="image cap"/>
-            <h5 class="title">Товар 1</h5>
-            <p class="text">Полное описание первого товара</p>
-            <p class=text">Цена 1000 руб.</p>
+            <img class="card-img-top" alt="img" src='<%= product.imageURL %>'/>
+            <h5 class="card-title"><%=product.title %></h5>
+            <p class="card-text"><%=product.full%></p>
+            <p class="card-text"> Цена <%=product.price%> руб.</p>
             <a href="#" class="btn btn-primary">Купить</a>
         </div>
     </div>
-   
+
 </main>
 <footer>
     <div>
         &#169; СCodery.camp 2020
     </div>
 </footer>
+
 </body>
 </html>
 

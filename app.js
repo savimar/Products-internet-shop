@@ -1,6 +1,11 @@
 const http = require('http');
 const fs = require('fs');
 const url = require('url');
+const ejs = require('ejs');
+const ProductService = require('./ProductService.js');
+
+ProductService.init();
+const products = ProductService.getProducts();
 
 function serveStatic (req, res, pathname) {
   res.statusCode = 200;
@@ -10,10 +15,24 @@ function serveStatic (req, res, pathname) {
     console.log('serveCSS');
     type = 'text/css';
     path = pathname.slice(1);
-  } else if (pathname.endsWith('.jpeg') || pathname.endsWith('.jpg')) {
+  } else if (pathname.endsWith('.jpeg') || pathname.endsWith('.jpg') || pathname.endsWith('.jpg/')) {
     console.log('serveJPG');
-    type = 'image/jpeg';
+    /*type = 'image/jpeg';
     path = pathname.slice(1);
+    if (fs.existsSync(path)) {
+      try {
+          let str = fs.readFileSync(path).toString();
+          ejs.render(str, {});
+       }catch (e) {
+        console.log(e);
+        serveNotFound(req, res, 500);
+      }
+    } else {
+      serveNotFound(req, res, 404);
+    }*/
+
+    res.end();
+    return;
   } else if (pathname.endsWith('.gif')) {
     console.log('serveGIF');
     type = 'image/gif';
@@ -28,14 +47,12 @@ function serveStatic (req, res, pathname) {
     path = pathname.slice(1);
   } else if (pathname.endsWith('product')) {
     console.log('serveProduct1');
-    type = 'text/html';
-    path = 'html\\product1.html';
+    serveIndex(req, res, 'views\\product.ejs');
+    return;
   } else {
-    console.log('serveIndex');
-    type = 'text/html';
-    path = 'html\\index.html';
+    serveIndex(req, res, 'views\\index.ejs');
+    return;
   }
-
   res.setHeader('Content-Type', type);
 
   /* if exist file */
@@ -54,6 +71,35 @@ function serveStatic (req, res, pathname) {
   res.end();
 }
 
+function serveIndex (req, res, path) {
+  console.log('serveIndex');
+
+  const data = {
+    product: {
+      title: products[0].title,
+      imageURL: products[0].img,
+      description: products[0].description,
+      price: products[0].price,
+    }
+  };
+
+  try {
+    const content = fs.readFileSync(path).toString();
+    let template = ejs.compile(content);
+    const product = template(data);
+
+    res.writeHead(200, {
+      'Content-Type': 'text/html; charset=utf-8'
+    });
+    res.write(product);
+    res.end();
+  } catch (e) {
+
+    console.log(e);
+    serveNotFound(req, res, 500);
+  }
+}
+
 function serveNotFound (req, res, code) {
   const content = 'Not found ' + code;
   console.log('serveNotFound ' + code);
@@ -66,15 +112,14 @@ function serveNotFound (req, res, code) {
 
 http.createServer(function (request, response) {
   try {
-    if (response.rel === 'shortcut icon') {
+    /*if (response.rel === 'shortcut icon') {
       href = '#';
-    }
+    }*/
     console.log('Request, url:', request.url);
 
-
     const parsedURL = url.parse(request.url, true);
-    console.log('Путь', parsedURL.pathname);
-
+    console.log('Путь', parsedURL.pathname)
+;
     if (parsedURL.pathname.startsWith('/img')) {
       serveStatic(request, response, parsedURL.pathname);
     } else if (parsedURL.pathname.startsWith('/css')) {
