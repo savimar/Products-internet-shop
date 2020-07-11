@@ -7,33 +7,20 @@
     <title>Продукт1</title>
 </head>
 <body>
-<header>
-    <div class="col-8 offset-2 col-sm-10 offset-sm-1 content">
-        <div class="col-12 col-md-9 menu">
-            <a class="itemMenu" href="#">Услуги</a>
-            <a class="active  itemMenu" href="#">Цены</a>
-            <a class="itemMenu" href="#">О компании</a>
-            <a class="itemMenu" href="#">Контакты</a>
-        </div>
-    </div>
-</header>
+<%- include("partials/menu.ejs") %>
 <main>
     <div class="box">
         <div class="content">
             <img class="card-img-top" alt="img" src='<%= product.imageURL %>'/>
             <h5 class="card-title"><%=product.title %></h5>
-            <p class="card-text"><%=product.full%></p>
+            <p class="card-text"><%=product.descriptionFull%></p>
             <p class="card-text"> Цена <%=product.price%> руб.</p>
             <a href="#" class="btn btn-primary">Купить</a>
         </div>
     </div>
 
 </main>
-<footer>
-    <div>
-        &#169; СCodery.camp 2020
-    </div>
-</footer>
+<%- include("partials/footer.ejs") %>
 
 </body>
 </html>

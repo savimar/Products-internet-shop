@@ -3,7 +3,6 @@ const fs = require('fs');
 const url = require('url');
 const ejs = require('ejs');
 const ProductService = require('./ProductService.js');
-
 ProductService.init();
 const products = ProductService.getProducts();
 
@@ -17,20 +16,6 @@ function serveStatic (req, res, pathname) {
     path = pathname.slice(1);
   } else if (pathname.endsWith('.jpeg') || pathname.endsWith('.jpg') || pathname.endsWith('.jpg/')) {
     console.log('serveJPG');
-    /*type = 'image/jpeg';
-    path = pathname.slice(1);
-    if (fs.existsSync(path)) {
-      try {
-          let str = fs.readFileSync(path).toString();
-          ejs.render(str, {});
-       }catch (e) {
-        console.log(e);
-        serveNotFound(req, res, 500);
-      }
-    } else {
-      serveNotFound(req, res, 404);
-    }*/
-
     res.end();
     return;
   } else if (pathname.endsWith('.gif')) {
@@ -79,15 +64,31 @@ function serveIndex (req, res, path) {
       title: products[0].title,
       imageURL: products[0].img,
       description: products[0].description,
+      descriptionFull: products[0].descriptionFull,
       price: products[0].price,
     }
   };
 
   try {
-    const content = fs.readFileSync(path).toString();
+ /*   const content = fs.readFileSync(path).toString();
     let template = ejs.compile(content);
-    const product = template(data);
+    const product = template(data);*/
 
+   let product;
+     ejs.renderFile(path,data, function (err, html) {
+     if (err) {
+       console.log("ERROR: " + err);
+       return false;
+     }
+     product = html.toString();
+     /*fs.writeFile(path + '.html', html, function (err) {
+       if (err) {
+         console.log(err);
+         return false;
+       }
+       return true;
+     });*/
+   });
     res.writeHead(200, {
       'Content-Type': 'text/html; charset=utf-8'
     });
@@ -112,9 +113,6 @@ function serveNotFound (req, res, code) {
 
 http.createServer(function (request, response) {
   try {
-    /*if (response.rel === 'shortcut icon') {
-      href = '#';
-    }*/
     console.log('Request, url:', request.url);
 
     const parsedURL = url.parse(request.url, true);
