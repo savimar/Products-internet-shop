@@ -1,45 +1,111 @@
-
-let products = [];
+const MongoClient = require('mongodb').MongoClient
+let url = 'mongodb://localhost:27017';
 module.exports = {
-  init() {
-    products.push({
-      title: "Товар 1",
-      img: "https://i.ibb.co/zfWF2Sw/product1.jpg",
-      description: "Краткое описание первого товара",
-      descriptionFull: "Полное описание первого товара",
-      price: 1000,
-      slug : "bag"
-    });
-    products.push({
-      title: "Товар 2",
-      img: "https://i.ibb.co/C7jxQCW/product2.jpg",
-      description: "Краткое описание второго товара",
-      descriptionFull: "Полное описание второго товара",
-      price: 1500,
-      slug : "program"
-    });
-    products.push({
-      title: "Товар 3",
-      img: "https://i.ibb.co/Js1JZYs/product3.jpg",
-      description: "Краткое описание третьего товара",
-      descriptionFull: "Полное описание третьего товара",
-      price: 2000,
-      slug : "light"
-    });
-  },
 
-  getProducts: function () {
-    return products;
-  },
-
-  getProductByKey(key, array){
-    if(key>= array.length) {
-      throw new Error("No index in array");
-    }
+  getProductByKey (key, array) {
     for (let i = 0; i < array.length; i++) {
-      if (i === key) {
-        return array[i];
+      if (array[i].key === key) {
+        return array[i]
       }
     }
+  },
+  /*init () {
+
+
+    MongoClient.connect(url, { useNewUrlParser: true })
+      .then(function (client) {
+        const db = client.db('shop');
+        const collection = db.collection('product');
+        collection.find().toArray(function (err, results) {
+          if (err) return console.log(err);
+          console.log('Получены данные');
+          console.log(results);
+          items = results;
+          if (results.length === 0) {
+            createDB(collection);
+          }
+          client.close();
+        });
+
+      });
+
+  },*/
+  getProducts: function () {
+    function createItems () {
+      return [
+        {
+          title: 'Товар 1',
+          img: 'img\/product1\.jpg',
+          description: 'Краткое описание первого товара',
+          descriptionFull: 'Полное описание первого товара',
+          key: 500,
+          price: 1000,
+          slug: 'bag'
+        },
+        {
+          title: 'Товар 2',
+          img: 'img\/product2\.jpg',
+          description: 'Краткое описание второго товара',
+          descriptionFull: 'Полное описание второго товара',
+          key: 750,
+          price: 1500,
+          slug: 'program'
+        },
+        {
+          title: 'Товар 3',
+          img: 'img\/product3\.jpg',
+          description: 'Краткое описание третьего товара',
+          descriptionFull: 'Полное описание третьего товара',
+          key: 1000,
+          price: 2000,
+          slug: 'light'
+        }];
+    }
+
+    function createDB (collection) {
+      /* collection.drop(function (err, result) {
+         if (err) return console.log(err);
+         console.log('Удалена БД');
+       });*/
+      let creating = createItems();
+      collection.insertMany(creating, function (err, results) {
+        if (err) return console.log(err);
+        console.log('Создана БД');
+        console.log(results);
+
+      })
+    }
+
+    return new Promise((resolve, reject) => {
+      MongoClient
+        .connect(url, function (err, client) {
+          if (err) {
+            reject(err)
+          }
+          client
+            .db('shop')
+            .collection('product')
+            .find()
+            .sort({ key: 1 })
+            .toArray(function (err, results) {
+              if (err) {
+                reject(err);
+              }
+              console.log('Получены данные');
+              console.log(results);
+              if (results.length === 0) {
+                createDB(client.db('shop').collection('product'))
+              }
+              client.close();
+              resolve(results);
+            })
+        })
+    })
   }
-};
+}
+
+
+
+
+
+
