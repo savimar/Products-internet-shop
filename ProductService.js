@@ -1,36 +1,35 @@
-const MongoClient = require('mongodb').MongoClient
+const MongoClient = require('mongodb').MongoClient;
 let url = 'mongodb://localhost:27017';
 module.exports = {
 
-  getProductByKey (key, array) {
-    for (let i = 0; i < array.length; i++) {
-      if (array[i].key === key) {
-        return array[i]
-      }
-    }
-  },
-  /*init () {
+    getProductByKey: function (key) {
+      return new Promise((resolve, reject) => {
+        MongoClient
+          .connect(url, function (err, client) {
+            if (err) {
+              reject(err);
+            }
+            client
+              .db('shop')
+              .collection('product')
+              .findOne({ key: key },
+                function (err, results) {
+                  if (err) {
+                    reject(err);
+                  }
+                  console.log('Получены данные');
+                  console.log(results);
+                  client.close();
+                  resolve(results);
+                });
 
-
-    MongoClient.connect(url, { useNewUrlParser: true })
-      .then(function (client) {
-        const db = client.db('shop');
-        const collection = db.collection('product');
-        collection.find().toArray(function (err, results) {
-          if (err) return console.log(err);
-          console.log('Получены данные');
-          console.log(results);
-          items = results;
-          if (results.length === 0) {
-            createDB(collection);
-          }
-          client.close();
-        });
-
+          });
       });
 
-  },*/
-  getProducts: function () {
+    },
+
+
+    getProducts: function () {
     function createItems () {
       return [
         {
@@ -73,14 +72,14 @@ module.exports = {
         console.log('Создана БД');
         console.log(results);
 
-      })
+      });
     }
 
     return new Promise((resolve, reject) => {
       MongoClient
         .connect(url, function (err, client) {
           if (err) {
-            reject(err)
+            reject(err);
           }
           client
             .db('shop')
@@ -94,15 +93,15 @@ module.exports = {
               console.log('Получены данные');
               console.log(results);
               if (results.length === 0) {
-                createDB(client.db('shop').collection('product'))
+                createDB(client.db('shop').collection('product'));
               }
               client.close();
               resolve(results);
-            })
-        })
-    })
+            });
+        });
+    });
   }
-}
+};
 
 
 
