@@ -89,6 +89,9 @@ a:hover {
 .menu > .active {
     color: LightGreen;
 }
+nav.breadcrumb{
+    margin-bottom:0;
+}
 nav a.breadcrumb-item {
     color: #007bff;
     padding: 0;
@@ -108,7 +111,7 @@ main {
 main .content {
     background-color: White;
     padding: 25px;
-    min-height: calc(100vh - 180px);
+    min-height: calc(100vh - 145px);
     max-height: calc(100vh - 40px);
 }
 

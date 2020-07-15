@@ -87,9 +87,15 @@ function serveIndex (req, res, pathName) {
 async function serveProduct (req, res, path) {
   console.log('serveProduct');
 
-  let key = path.split('-')[0].replace('/product/', '');
+  let arr = path.split('-');
+  let key = arr[0].replace('/product/', '');
+  let slug = arr[1];
   let data = await getProduct(key);
-  if (data != null) {
+  if (data !== null) {
+    if(slug !== data.slug){
+      redirect(req, res, `/product/${key}-${data.slug}`);
+      return;
+    }
     try {
       const scope = {
         product: data
@@ -126,6 +132,14 @@ function serveNotFound (req, res, code, message) {
   res.end();
 }
 
+function redirect (req, res, newURL) {
+  console.log('redirect ' + newURL);
+   res.writeHead(301, {
+     Location: newURL,
+    'Content-Type': 'text/html; charset=utf-8'
+  });
+   res.end();
+}
 http.createServer(function (request, response) {
   try {
     console.log('Request, url:', request.url);
