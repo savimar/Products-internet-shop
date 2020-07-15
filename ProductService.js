@@ -34,7 +34,7 @@ module.exports = {
       return [
         {
           title: 'Товар 1',
-          img: 'img\/product1\.jpg',
+          img: '\/img\/product1\.jpg',
           description: 'Краткое описание первого товара',
           descriptionFull: 'Полное описание первого товара',
           key: 500,
@@ -43,7 +43,7 @@ module.exports = {
         },
         {
           title: 'Товар 2',
-          img: 'img\/product2\.jpg',
+          img: '\/img\/product2\.jpg',
           description: 'Краткое описание второго товара',
           descriptionFull: 'Полное описание второго товара',
           key: 750,
@@ -52,7 +52,7 @@ module.exports = {
         },
         {
           title: 'Товар 3',
-          img: 'img\/product3\.jpg',
+          img: '\/img\/product3\.jpg',
           description: 'Краткое описание третьего товара',
           descriptionFull: 'Полное описание третьего товара',
           key: 1000,
@@ -97,6 +97,7 @@ module.exports = {
               }
               client.close();
               resolve(results);
+
             });
         });
     });

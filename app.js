@@ -4,9 +4,7 @@ const url = require('url');
 const ejs = require('ejs');
 const ProductService = require('./ProductService.js');
 let items;
-ProductService.getProducts().then(function (getData) {
-  items = getData;
-});
+ProductService.getProducts().then(value => {items = value;});
 
 function serveStatic (req, res, pathname) {
   res.statusCode = 200;
@@ -47,7 +45,7 @@ function serveStatic (req, res, pathname) {
     });
   } catch (e) {
     console.log(e);
-    serveNotFound(req, res, 500);
+    serveNotFound(req, res, 404);
   }
 
 }
@@ -80,7 +78,6 @@ function serveIndex (req, res, pathName) {
   const scope = {
     products: items
   };
-
   getHTML(pathName, scope, res, req);
 }
 
@@ -88,11 +85,10 @@ async function serveProduct (req, res, path) {
   console.log('serveProduct');
 
   let key = path.split('-')[0].replace('/product/', '');
-  let data = await getProduct(key);
 
   try {
     const scope = {
-      product: data
+      product: await getProduct(key)
     };
 
     getHTML('views\\product.ejs', scope, res, req);
@@ -102,6 +98,7 @@ async function serveProduct (req, res, path) {
   }
 
 }
+
 async function getProduct (key) {
   return await ProductService.getProductByKey(Number.parseInt(key))
     .then(value => {
@@ -110,6 +107,7 @@ async function getProduct (key) {
     });
   // .catch(serveNotFound(req, res, 500));
 }
+
 function serveNotFound (req, res, code) {
   const content = 'Not found ' + code;
   console.log('serveNotFound ' + code);
@@ -126,10 +124,8 @@ http.createServer(function (request, response) {
     const parsedURL = url.parse(request.url, true);
 
     let path = parsedURL.pathname;
-    if (path.startsWith('/product/css/') || path.startsWith('/product/img/')) {
-      path = path.replace('/product', '');
-    }
     console.log('Путь', path);
+
     if (path.startsWith('/img')) {
       serveStatic(request, response, path);
     } else if (path.startsWith('/css')) {
