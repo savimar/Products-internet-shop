@@ -4,7 +4,9 @@ const url = require('url');
 const ejs = require('ejs');
 const ProductService = require('./ProductService.js');
 let items;
-ProductService.getProducts().then(value => {items = value;});
+ProductService.getProducts().then(value => {
+  items = value;
+});
 
 function serveStatic (req, res, pathname) {
   res.statusCode = 200;
@@ -45,7 +47,7 @@ function serveStatic (req, res, pathname) {
     });
   } catch (e) {
     console.log(e);
-    serveNotFound(req, res, 404);
+    serveNotFound(req, res, 404, 'Не найден файл css или изображения');
   }
 
 }
@@ -68,7 +70,7 @@ function getHTML (pathName, scope, res, req) {
     res.end();
   } catch (e) {
     console.log(e);
-    serveNotFound(req, res, 500);
+    serveNotFound(req, res, 500, 'Ошибка сервера');
   }
 }
 
@@ -78,6 +80,7 @@ function serveIndex (req, res, pathName) {
   const scope = {
     products: items
   };
+
   getHTML(pathName, scope, res, req);
 }
 
@@ -85,16 +88,19 @@ async function serveProduct (req, res, path) {
   console.log('serveProduct');
 
   let key = path.split('-')[0].replace('/product/', '');
+  let data = await getProduct(key);
+  if (data != null) {
+    try {
+      const scope = {
+        product: data
+      };
+      getHTML('views\\product.ejs', scope, res, req);
+    } catch (e) {
+      console.log(e);
 
-  try {
-    const scope = {
-      product: await getProduct(key)
-    };
-
-    getHTML('views\\product.ejs', scope, res, req);
-
-  } catch (e) {
-    console.log(e);
+    }
+  } else {
+    serveNotFound(req, res, 500, 'Не найден товар');
   }
 
 }
@@ -105,16 +111,18 @@ async function getProduct (key) {
       console.log(value);
       return value;
     });
-  // .catch(serveNotFound(req, res, 500));
+  //.catch(serveNotFound(req, res, 500, "Не найден товар"));
 }
 
-function serveNotFound (req, res, code) {
-  const content = 'Not found ' + code;
+function serveNotFound (req, res, code, message) {
+  if (!message) {
+    message = 'Not found ' + code;
+  }
   console.log('serveNotFound ' + code);
   res.writeHead(code, {
     'Content-Type': 'text/html; charset=utf-8'
   });
-  res.write(content);
+  res.write(message);
   res.end();
 }
 
@@ -135,11 +143,11 @@ http.createServer(function (request, response) {
     } else if (path === '/') {
       serveIndex(request, response, 'views\\index.ejs');
     } else {
-      serveNotFound(request, response, 404);
+      serveNotFound(request, response, 404, 'Страница не найдена');
     }
   } catch (e) {
     console.log(e);
-    serveNotFound(request, response, 500);
+    serveNotFound(request, response, 500, 'Ошибка сервера');
   }
 }).listen(8000, '127.0.0.1', function () {
   console.log('Сервер начал прослушивание запросов ');
