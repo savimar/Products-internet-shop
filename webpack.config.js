@@ -1,6 +1,6 @@
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const HtmlWebPackPlugin = require('react-to-html-webpack-plugin');
+//const HtmlWebPackPlugin = require('react-to-html-webpack-plugin');
 const path = require('path');
 
 module.exports = {

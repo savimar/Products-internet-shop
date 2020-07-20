@@ -1,7 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const url = require('url');
-//const ejs = require('ejs');
+const ejs = require('ejs');
 const ProductService = require('./ProductService.js');
 //const Bundle = require('./public/bundle.js');
 //import './public/bundle.js';
@@ -39,9 +39,50 @@ function serveStatic (req, res, pathname) {
     type = 'image/ico';
     path = pathname.slice(1);
   }
-  res.setHeader('Content-Type', type);
+
 
   /* if exist file */
+  serveSPA(req, res, path, type);
+
+}
+
+function getHTML (pathName, scope, res, req) {
+  let htmlStr;
+  try {
+  //
+    /*fs.readFile(pathName, function (err, data) {
+      if (err) {
+        console.log(err);
+        throw new Error(err);
+      }
+      res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8'
+      });
+      res.write(data);
+      res.end(data, 'binary');
+    });*/
+    ejs.renderFile(pathName, scope, function (err, html) {
+      if (err) {
+        console.log('ERROR: ' + err);
+        return false;
+      }
+      htmlStr = html.toString();
+
+    });
+    res.writeHead(200, {
+      'Content-Type': 'text/html; charset=utf-8'
+    });
+    res.write(htmlStr);
+    res.end();
+  } catch (e) {
+    console.log(e);
+    serveNotFound(req, res, 500, 'Ошибка сервера');
+  }
+}
+
+function serveSPA (req, res, path, type) {
+  console.log('serveSpa');
+  res.setHeader('Content-Type', type);
   try {
     fs.readFile(path, function (err, data) {
       if (err) {
@@ -53,41 +94,7 @@ function serveStatic (req, res, pathname) {
     });
   } catch (e) {
     console.log(e);
-    serveNotFound(req, res, 404, 'Не найден файл css или изображения');
-  }
-
-}
-
-function getHTML (pathName, scope, res, req) {
-  try {
-  //  let htmlStr;
-    fs.readFile(pathName, function (err, data) {
-      if (err) {
-        console.log(err);
-        throw new Error(err);
-      }
-      res.writeHead(200, {
-        'Content-Type': 'text/html; charset=utf-8'
-      });
-      res.write(data);
-      res.end(data, 'binary');
-    });
-    /*ejs.renderFile(pathName, scope, function (err, html) {
-      if (err) {
-        console.log('ERROR: ' + err);
-        return false;
-      }
-      htmlStr = html.toString();
-
-    });*/
- /*   res.writeHead(200, {
-      'Content-Type': 'text/html; charset=utf-8'
-    });
-    res.write(htmlStr);
-    res.end();*/
-  } catch (e) {
-    console.log(e);
-    serveNotFound(req, res, 500, 'Ошибка сервера');
+    serveNotFound(req, res, 404, 'Не найден файл' + type);
   }
 }
 
@@ -172,11 +179,11 @@ function redirect (req, res, newURL) {
     } else if (path.startsWith('/product')) {
      serveProduct(request, response, path);
     } else if (path==='/public/bundle.js') {
-      //Bundle.
+      serveSPA(request, response, path.slice(1),'text/javascript');
     } else if (path==='/public/img/favicon.ico') {
       serveStatic(request, response, path);
     }else if (path === '/') {
-      serveIndex(request, response );
+      serveSPA(request, response, 'public/spa.html','text/html');
     } else {
       serveNotFound(request, response, 404, 'Страница не найдена');
     }
