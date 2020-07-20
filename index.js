@@ -1,8 +1,10 @@
 const http = require('http');
 const fs = require('fs');
 const url = require('url');
-const ejs = require('ejs');
+//const ejs = require('ejs');
 const ProductService = require('./ProductService.js');
+//const Bundle = require('./public/bundle.js');
+//import './public/bundle.js';
 let items;
 ProductService.getProducts().then(value => {
   items = value;
@@ -32,6 +34,10 @@ function serveStatic (req, res, pathname) {
     console.log('serveTIFF');
     type = 'image/tiff';
     path = pathname.slice(1);
+  }else if (pathname.endsWith('.ico')) {
+    console.log('serveFavicon');
+    type = 'image/ico';
+    path = pathname.slice(1);
   }
   res.setHeader('Content-Type', type);
 
@@ -54,34 +60,45 @@ function serveStatic (req, res, pathname) {
 
 function getHTML (pathName, scope, res, req) {
   try {
-    let htmlStr;
-    ejs.renderFile(pathName, scope, function (err, html) {
+  //  let htmlStr;
+    fs.readFile(pathName, function (err, data) {
+      if (err) {
+        console.log(err);
+        throw new Error(err);
+      }
+      res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8'
+      });
+      res.write(data);
+      res.end(data, 'binary');
+    });
+    /*ejs.renderFile(pathName, scope, function (err, html) {
       if (err) {
         console.log('ERROR: ' + err);
         return false;
       }
       htmlStr = html.toString();
 
-    });
-    res.writeHead(200, {
+    });*/
+ /*   res.writeHead(200, {
       'Content-Type': 'text/html; charset=utf-8'
     });
     res.write(htmlStr);
-    res.end();
+    res.end();*/
   } catch (e) {
     console.log(e);
     serveNotFound(req, res, 500, 'Ошибка сервера');
   }
 }
 
-function serveIndex (req, res, pathName) {
+function serveIndex (req, res) {
   console.log('serveIndex');
 
   const scope = {
     products: items
   };
 
-  getHTML(pathName, scope, res, req);
+  getHTML('public/pages/spa.html', scope, res, req);
 }
 
 async function serveProduct (req, res, path) {
@@ -140,7 +157,7 @@ function redirect (req, res, newURL) {
   });
    res.end();
 }
-http.createServer(function (request, response) {
+ http.createServer(function (request, response) {
   try {
     console.log('Request, url:', request.url);
     const parsedURL = url.parse(request.url, true);
@@ -148,14 +165,18 @@ http.createServer(function (request, response) {
     let path = parsedURL.pathname;
     console.log('Путь', path);
 
-    if (path.startsWith('/img')) {
+    if (path.startsWith('/public/img')) {
       serveStatic(request, response, path);
-    } else if (path.startsWith('/css')) {
+    } else if (path.startsWith('/public/css')) {
       serveStatic(request, response, path);
     } else if (path.startsWith('/product')) {
-      serveProduct(request, response, path);
-    } else if (path === '/') {
-      serveIndex(request, response, 'views\\index.ejs');
+     serveProduct(request, response, path);
+    } else if (path==='/public/bundle.js') {
+      //Bundle.
+    } else if (path==='/public/img/favicon.ico') {
+      serveStatic(request, response, path);
+    }else if (path === '/') {
+      serveIndex(request, response );
     } else {
       serveNotFound(request, response, 404, 'Страница не найдена');
     }
