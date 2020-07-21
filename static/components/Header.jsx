@@ -1,7 +1,4 @@
 import * as React from 'react';
-import ReactDOM from 'react-dom';
-import * as rrd from "react-router-dom";
-export const Link = React.createContext(rrd.Link);
 import Nav from './Nav';
 
 

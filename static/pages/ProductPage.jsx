@@ -1,10 +1,8 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import Header from '../components/Header'
 import IndexPage from './IndexPage'
 import Footer from '../components/Footer'
 import ProductBox from '../components/ProductBox'
-//import {items} from './IndexPage';
 let product;
 const items =
   [
@@ -40,8 +38,7 @@ export default class ProductPage extends React.Component {
 
   constructor (props) {
     super(props);
-    //= useParams();
-    let productUrl = this.props.match.params.product;//.product //this.props.url.product;
+     let productUrl = this.props.match.params.product;
     let arr = productUrl.split("-");
     let key = arr[0];//.replace('/product/', '');
     let slug = arr[1];

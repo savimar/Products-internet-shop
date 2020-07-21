@@ -1,12 +1,9 @@
 import * as React from 'react'
-import ReactDOM from 'react-dom'
-import * as rrd from "react-router-dom";
-export const Link = React.createContext(rrd.Link);
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import Products from '../components/Products'
 
- const items =
+const items =
   [
     {
       title: 'Товар 1',
@@ -34,22 +31,19 @@ import Products from '../components/Products'
       key: 1000,
       price: 2000,
       slug: 'light'
-    }];
+    }]
 
 export default class IndexPage extends React.Component {
-
 
   render () {
     return (
       <React.Fragment>
-        <Header />
-        <Products items={items} />
-        <Footer />
+        <Header/>
+        <Products items={items}/>
+        <Footer/>
       </React.Fragment>
     )
   }
-
-
 
 }
 
