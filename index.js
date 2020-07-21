@@ -112,15 +112,17 @@ async function serveProduct (req, res, path) {
   console.log('serveProduct');
 
   let arr = path.split('-');
-  let key = arr[0].replace('/product/', '');
+  let key = arr[0].replace('/items/', '');
   let slug = arr[1];
-  let data = await getProduct(key);
+redirect(req, res, "/items/" +key + "-"+ slug);
+ // serveSPA(req, res, 'public/bundle.js/products/' + key, 'text/javascript');
+  /*let data = await getProduct(key);
   if (data !== null) {
     if(slug !== data.slug){
       redirect(req, res, `/product/${key}-${data.slug}`);
       return;
-    }
-    try {
+    }*/
+    /*try {
       const scope = {
         product: data
       };
@@ -128,10 +130,10 @@ async function serveProduct (req, res, path) {
     } catch (e) {
       console.log(e);
 
-    }
-  } else {
+    }*/
+  /*} else {
     serveNotFound(req, res, 500, 'Не найден товар');
-  }
+  }*/
 
 }
 
@@ -176,16 +178,17 @@ function redirect (req, res, newURL) {
       serveStatic(request, response, path);
     } else if (path.startsWith('/public/css')) {
       serveStatic(request, response, path);
-    } else if (path.startsWith('/product')) {
+    } else if (path.startsWith('/items')) {
      serveProduct(request, response, path);
+     // redirect(request, response, path);
     } else if (path==='/public/bundle.js') {
       serveSPA(request, response, path.slice(1),'text/javascript');
     } else if (path==='/public/img/favicon.ico') {
       serveStatic(request, response, path);
-    }else if (path === '/') {
+    }else if (path === '/' || path === '/#/' ) {
       serveSPA(request, response, 'public/spa.html','text/html');
     } else {
-      serveNotFound(request, response, 404, 'Страница не найдена');
+      serveNotFound(request, response, 404, 'Файл не найден');
     }
   } catch (e) {
     console.log(e);

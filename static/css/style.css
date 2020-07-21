@@ -22,7 +22,8 @@ body {
 .box {
     width: 80%;
     margin-left: auto;
-    margin-right: auto
+    margin-right: auto;
+
 }
 
 
@@ -31,6 +32,7 @@ body {
     margin-right: auto;
     margin-top: 5%;
     margin-bottom: 7%;
+    display:inline-block;
 }
 
 
@@ -147,6 +149,7 @@ main .content {
 
 .card-text {
     margin-top: 5%;
+    align-content: center;
 }
 
 footer {

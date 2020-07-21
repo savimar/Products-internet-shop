@@ -1,3 +1,6 @@
+//import { SourceMapDevToolPlugin } from 'webpack'
+//import * as webpack from 'webpack';
+
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 //const HtmlWebPackPlugin = require('react-to-html-webpack-plugin');
@@ -12,6 +15,7 @@ module.exports = {
     filename: 'bundle.js',
     publicPath: '/public/'
   },
+  //devtool: "source-map",
   module: {
     rules: [
       {
@@ -19,10 +23,15 @@ module.exports = {
 
         exclude: /node_modules/,
         use: {
-          loader: "babel-loader",
+          loader: 'babel-loader?cacheDirectory=true',
+
+         // loader: "babel-loader",
+          /*query: {
+            presets: ['es2015']
+          },*/
           options: {
             presets: [
-              "@babel/preset-react",
+            /*  "@babel/preset-react",*/
               {
                 plugins: ["@babel/plugin-proposal-class-properties"],
               },
@@ -30,31 +39,33 @@ module.exports = {
           },
         },
       },
-      {
+      /*{
         test: /\.(png|svg|jpg|gif)$/,
         use: [
           'file-loader'
         ]
-      },
+      },*/
       /*{
         test: /\.js$/,
         exclude: /node_modules/,
         use: ["babel-loader"]
       },*/
-      {
+      /*{
         test: /\.css$/,
         use: ["style-loader", "css-loader"]
-      }
+      }*/
     ],
 },
 resolve: {
   extensions: [".js", ".jsx"],
 },
 
-
+  cache: true,
+  devtool: "eval-source-map",
 
   plugins: [
     new CleanWebpackPlugin(),
+  //new webpack.SourceMapDevToolPlugin({}),
     /*new HtmlWebPackPlugin({
       hash: true,
      filename: "./public/pages/spa.html",

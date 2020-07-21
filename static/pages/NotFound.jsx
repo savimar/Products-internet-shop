@@ -1,13 +1,12 @@
+import React from "react";
+import Breadcrumb from '../components/Breadcrumb'
 export default class ProductPage extends React.Component {
   render () {
-    return
+    return(
     <main>
-      <div className="col-8 offset-2 col-sm-10 offset-sm-1 content">
-        <nav className="breadcrumb">
-          <a className="breadcrumb-item active" href="/">Домой</a>
-        </nav>
-      </div>
+      <Breadcrumb />
       Not found
     </main>
+    )
   }
 }
