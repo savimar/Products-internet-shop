@@ -157,6 +157,35 @@ function serveNotFound (req, res, code, message) {
   res.end();
 }
 
+async function serveAPI (req, res, path) {
+  let products;
+  let arr = path.split('/');
+
+  if (arr.length === 3) {
+    products = await ProductService.getProducts();
+  } else if (arr.length === 4) {
+    let id = arr[3];
+    if ((parseInt(id, 16) >= 0 || parseInt(id, 16) < 0) && unescape(encodeURIComponent(id)).length === 24) {
+      console.log(parseInt(id, 16));
+      products = await ProductService.getProductById(id);
+    } else {
+      serveNotFound(req, res, 500, 'Ошибка сервера');
+      return;
+    }
+  }
+  if (products === null || products === undefined) {
+    serveNotFound(req, res, 404, 'Товар не найден');
+    return;
+  }
+
+  res.writeHead(200, {
+    'Content-Type': 'application/json; charset=utf-8'
+  });
+  res.write(JSON.stringify(products));
+  res.end();
+
+}
+
 function redirect (req, res, newURL) {
   console.log('redirect ' + newURL);
   res.writeHead(301, {
@@ -187,6 +216,8 @@ http.createServer(function (request, response) {
       serveStatic(request, response, '/public/img/favicon.ico');
     } else if (path === '/' || path === '/#/') {
       serveSPA(request, response, 'public/spa.html', 'text/html');
+    } else if (path.startsWith('/api/product')) {
+      serveAPI(request, response, path);
     } else {
       serveNotFound(request, response, 404, 'Файл не найден');
     }

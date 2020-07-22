@@ -1,36 +1,61 @@
-const MongoClient = require('mongodb').MongoClient;
+const mongodb = require('mongodb');
+const MongoClient = mongodb.MongoClient;
 let url = 'mongodb://localhost:27017';
 module.exports = {
 
+  getProductById: function (productId) {
+    return new Promise((resolve, reject) => {
+      MongoClient
+        .connect(url, function (err, client) {
+          if (err) {
+            reject(err);
+          }
+          client
+            .db('shop')
+            .collection('product')
+            .findOne({ _id: mongodb.ObjectID(productId)},
+            (function (err, results) {
+              if (err) {
+                reject(err);
+              }
+              console.log('Получены данные');
+              console.log(results);
+              client.close();
+              resolve(results);
+            }));
 
-    getProductByKey: function (key) {
-      return new Promise((resolve, reject) => {
-        MongoClient
-          .connect(url, function (err, client) {
-            if (err) {
-              reject(err);
-            }
-            client
-              .db('shop')
-              .collection('product')
-              .findOne({ key: key },
-                function (err, results) {
-                  if (err) {
-                    reject(err);
-                  }
-                  console.log('Получены данные');
-                  console.log(results);
-                  client.close();
-                  resolve(results);
-                });
+        });
+    });
 
-          });
-      });
+  },
 
-    },
+  getProductByKey: function (key) {
+    return new Promise((resolve, reject) => {
+      MongoClient
+        .connect(url, function (err, client) {
+          if (err) {
+            reject(err);
+          }
+          client
+            .db('shop')
+            .collection('product')
+            .findOne({ key: key },
+              function (err, results) {
+                if (err) {
+                  reject(err);
+                }
+                console.log('Получены данные');
+                console.log(results);
+                client.close();
+                resolve(results);
+              });
 
+        });
+    });
 
-    getProducts: function () {
+  },
+
+  getProducts: function () {
     function createItems () {
       return [
         {
