@@ -1,6 +1,6 @@
 import React from 'react'
 import Breadcrumb from '../components/Breadcrumb'
-import { HashRouter, Link } from 'react-router-dom'
+import { HashRouter, BrowserRouter, Link } from 'react-router-dom'
 
 export default class Products extends React.Component {
   constructor (props) {
@@ -23,7 +23,6 @@ export default class Products extends React.Component {
                     <p className="card-text"> Цена {item.price} руб.</p>
                     <Link className="btn btn-primary" to={'/items/' + item.key + '-' + item.slug}>Купить</Link>
                   </HashRouter>
-
                 </div>
               </React.Fragment>
             ))}

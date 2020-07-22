@@ -34,12 +34,11 @@ function serveStatic (req, res, pathname) {
     console.log('serveTIFF');
     type = 'image/tiff';
     path = pathname.slice(1);
-  }else if (pathname.endsWith('.ico')) {
+  } else if (pathname.endsWith('.ico')) {
     console.log('serveFavicon');
     type = 'image/ico';
     path = pathname.slice(1);
   }
-
 
   /* if exist file */
   serveSPA(req, res, path, type);
@@ -49,7 +48,7 @@ function serveStatic (req, res, pathname) {
 function getHTML (pathName, scope, res, req) {
   let htmlStr;
   try {
-  //
+    //
     /*fs.readFile(pathName, function (err, data) {
       if (err) {
         console.log(err);
@@ -114,23 +113,23 @@ async function serveProduct (req, res, path) {
   let arr = path.split('-');
   let key = arr[0].replace('/items/', '');
   let slug = arr[1];
-redirect(req, res, "/items/" +key + "-"+ slug);
- // serveSPA(req, res, 'public/bundle.js/products/' + key, 'text/javascript');
+  redirect(req, res, '/items/' + key + '-' + slug);
+  // serveSPA(req, res, 'public/bundle.js/products/' + key, 'text/javascript');
   /*let data = await getProduct(key);
   if (data !== null) {
     if(slug !== data.slug){
       redirect(req, res, `/product/${key}-${data.slug}`);
       return;
     }*/
-    /*try {
-      const scope = {
-        product: data
-      };
-      getHTML('views\\product.ejs', scope, res, req);
-    } catch (e) {
-      console.log(e);
+  /*try {
+    const scope = {
+      product: data
+    };
+    getHTML('views\\product.ejs', scope, res, req);
+  } catch (e) {
+    console.log(e);
 
-    }*/
+  }*/
   /*} else {
     serveNotFound(req, res, 500, 'Не найден товар');
   }*/
@@ -160,13 +159,14 @@ function serveNotFound (req, res, code, message) {
 
 function redirect (req, res, newURL) {
   console.log('redirect ' + newURL);
-   res.writeHead(301, {
-     Location: newURL,
+  res.writeHead(301, {
+    Location: newURL,
     'Content-Type': 'text/html; charset=utf-8'
   });
-   res.end();
+  res.end();
 }
- http.createServer(function (request, response) {
+
+http.createServer(function (request, response) {
   try {
     console.log('Request, url:', request.url);
     const parsedURL = url.parse(request.url, true);
@@ -179,14 +179,14 @@ function redirect (req, res, newURL) {
     } else if (path.startsWith('/public/css')) {
       serveStatic(request, response, path);
     } else if (path.startsWith('/items')) {
-     serveProduct(request, response, path);
-     // redirect(request, response, path);
-    } else if (path==='/public/bundle.js') {
-      serveSPA(request, response, path.slice(1),'text/javascript');
-    } else if (path==='/public/img/favicon.ico') {
-      serveStatic(request, response, path);
-    }else if (path === '/' || path === '/#/' ) {
-      serveSPA(request, response, 'public/spa.html','text/html');
+      serveProduct(request, response, path);
+      // redirect(request, response, path);
+    } else if (path === '/public/bundle.js') {
+      serveSPA(request, response, path.slice(1), 'text/javascript');
+    } else if (path === '/favicon.ico') {
+      serveStatic(request, response, '/public/img/favicon.ico');
+    } else if (path === '/' || path === '/#/') {
+      serveSPA(request, response, 'public/spa.html', 'text/html');
     } else {
       serveNotFound(request, response, 404, 'Файл не найден');
     }

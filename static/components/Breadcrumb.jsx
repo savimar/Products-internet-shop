@@ -1,5 +1,5 @@
 import React from 'react'
-import { HashRouter, Link } from 'react-router-dom'
+import { HashRouter, BrowserRouter, Link } from 'react-router-dom'
 
 export default class Breadcrumb extends React.Component {
   render () {

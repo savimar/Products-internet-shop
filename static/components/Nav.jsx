@@ -1,5 +1,4 @@
 import * as React from 'react'
-export const Link = React.createContext(rrd.Link)
 
 export default class Nav extends React.Component {
   constructor (props) {

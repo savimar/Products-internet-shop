@@ -60,7 +60,7 @@ resolve: {
   extensions: [".js", ".jsx"],
 },
 
-  cache: true,
+ // cache: true,
   devtool: "eval-source-map",
 
   plugins: [

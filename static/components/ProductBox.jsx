@@ -9,7 +9,6 @@ export default class Products extends React.Component {
   render () {
     return (
       <main>
-
         <div className="container">
           <div className="box">
             <div className="content">
