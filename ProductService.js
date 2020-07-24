@@ -4,6 +4,7 @@ let url = 'mongodb://localhost:27017';
 module.exports = {
 
   getProductById: function (productId) {
+
     return new Promise((resolve, reject) => {
       MongoClient
         .connect(url, function (err, client) {
@@ -16,6 +17,7 @@ module.exports = {
             .findOne({ _id: mongodb.ObjectID(productId)},
             (function (err, results) {
               if (err) {
+                console.log(err.message());
                 reject(err);
               }
               console.log('Получены данные');

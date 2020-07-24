@@ -10,7 +10,7 @@ export default class IndexPage extends React.Component {
     return (
       <React.Fragment>
         <Header/>
-        <Products items={Items()}/>
+        <Products />
         <Footer/>
       </React.Fragment>
     )

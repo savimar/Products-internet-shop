@@ -216,7 +216,7 @@ http.createServer(function (request, response) {
       serveStatic(request, response, '/public/img/favicon.ico');
     } else if (path === '/' || path === '/#/') {
       serveSPA(request, response, 'public/spa.html', 'text/html');
-    } else if (path.startsWith('/api/product')) {
+    } else if (path.indexOf('/api/product') >=0) {
       serveAPI(request, response, path);
     } else {
       serveNotFound(request, response, 404, 'Файл не найден');

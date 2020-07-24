@@ -14,6 +14,7 @@ class App extends React.Component {
         <Switch>
           <Route exact path="/" component={IndexPage}/>
           <Route exact path="/items/:product" component={ProductPage}/>
+          {/*<Route exact path="/api/product" component={() => (<Redirect to="/api/product"/>)}/>*/}
           <Route path="*" component={NotFound}/>
         </Switch>
       </HashRouter>
