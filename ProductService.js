@@ -14,7 +14,40 @@ module.exports = {
           client
             .db('shop')
             .collection('product')
-            .findOne({ _id: mongodb.ObjectID(productId)},
+            .findOne({ _id: mongodb.ObjectID(productId) },
+              (function (err, results) {
+                if (err) {
+                  console.log(err.message());
+                  reject(err);
+                }
+                console.log('Получены данные');
+                console.log(results);
+                client.close();
+                resolve(results);
+              }));
+
+        });
+    });
+
+  },
+
+  getProductByWhere: function (where) {
+    let key = Object.getOwnPropertyNames(where)[0];
+    if(key ==="key"){
+      where = {
+        key : Number.parseInt(where[key])
+      };
+    }
+    return new Promise((resolve, reject) => {
+      MongoClient
+        .connect(url, function (err, client) {
+          if (err) {
+            reject(err);
+          }
+          client
+            .db('shop')
+            .collection('product')
+            .find(where).toArray(
             (function (err, results) {
               if (err) {
                 console.log(err.message());
@@ -31,7 +64,7 @@ module.exports = {
 
   },
 
-  getProductByKey: function (key) {
+  /*getProductByKey: function (key) {
     return new Promise((resolve, reject) => {
       MongoClient
         .connect(url, function (err, client) {
@@ -55,7 +88,7 @@ module.exports = {
         });
     });
 
-  },
+  },*/
 
   getProducts: function () {
     function createItems () {
@@ -71,7 +104,7 @@ module.exports = {
         },
         {
           title: 'Товар 2',
-          img: '/public\/img\/product2\.jpg',
+          img: '\/public\/img\/product2\.jpg',
           description: 'Краткое описание второго товара',
           descriptionFull: 'Полное описание второго товара',
           key: 750,
@@ -80,7 +113,7 @@ module.exports = {
         },
         {
           title: 'Товар 3',
-          img: '/public\/img\/product3\.jpg',
+          img: '\/public\/img\/product3\.jpg',
           description: 'Краткое описание третьего товара',
           descriptionFull: 'Полное описание третьего товара',
           key: 1000,

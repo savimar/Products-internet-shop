@@ -2,7 +2,6 @@ import * as React from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import Products from '../components/Products'
-import Items from '../components/Const'
 
 export default class IndexPage extends React.Component {
 
@@ -10,7 +9,7 @@ export default class IndexPage extends React.Component {
     return (
       <React.Fragment>
         <Header/>
-        <Products />
+        <Products/>
         <Footer/>
       </React.Fragment>
     )

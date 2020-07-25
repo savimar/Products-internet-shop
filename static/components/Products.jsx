@@ -1,6 +1,6 @@
 import React from 'react'
 import Breadcrumb from '../components/Breadcrumb'
-import { HashRouter, BrowserRouter, Link } from 'react-router-dom'
+import { HashRouter, Link } from 'react-router-dom'
 
 export default class Products extends React.Component {
   constructor (props) {
@@ -15,46 +15,27 @@ export default class Products extends React.Component {
     this.setState(state => ({
       status: 'pending'
     }))
+
     return (
-      fetch('/api/product')
-        .then(setTimeout(function () {
-        }, 200))
-        .then(res => res.json())
-        .then(list => this.setState({ list }))
-        .then(() => this.setState(state => ({
-          status: 'ready'
-        })))
-        .catch(error => {
-          console.error(error)
-          this.setState(state => ({
-            status: 'error'
-          }))
-        })
+      new Promise(resolve => {
+        setTimeout(() => {
+          resolve(fetch('/api/product')
+            .then(res => res.json())
+            .then(list => this.setState({ list }))
+            .then(() => this.setState(state => ({
+              status: 'ready'
+            })))
+          )
+        }, 500)
+      }).catch(error => {
+        console.error(error)
+        this.setState(state => ({
+          status: 'error'
+        }))
+      })
 
     )
   }
-
-  /*fetch('/api/product')
-    .then(function (response) {
-      return response.json()
-    })
-    .then(function (json) {
-      return JSON.parse(json)
-    }.bind(this))*/
-
-  /* let response = await fetch('/api/products');
-   if (response.ok) { // если HTTP-статус в диапазоне 200-299
-                      // получаем тело ответа (см. про этот метод ниже)
-     let json = await response.json();
-     return  await JSON.parse(json);*/
-  /* return fetch('/api/products')
-       .then(response => response.json()) // преобразуем ответ в json
-       .then(data => {
-         JSON.parse(data) // выводим в консоль результат выполнения response.json()
-       })*/
-  //   .catch(error => console.error(error))
-
-  //}
 
   componentDidMount () {
     this.renderProducts()
@@ -64,13 +45,13 @@ export default class Products extends React.Component {
     if (this.state.status === 'ready') {
       return (
         <div className="alert alert-primary" role="alert">
-         Товары загружены
+          Товары загружены
         </div>
       )
     } else if (this.state.status === 'ready') {
       return (
         <div className="alert alert-danger" role="alert">
-         Ошибка загрузки товаров
+          Ошибка загрузки товаров
         </div>
       )
     }
@@ -100,7 +81,7 @@ export default class Products extends React.Component {
                 )
               )) : (
               <div>
-                <h4>Товары не найдены</h4>
+                <h4>Идет поиск товара</h4>
               </div>)
             }
             {this.renderElement()}
