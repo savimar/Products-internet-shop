@@ -13,7 +13,7 @@ class App extends React.Component {
       <HashRouter history={createHashHistory()}>
         <Switch>
           <Route exact path="/" component={IndexPage}/>
-          <Route exact path="/items/:product" component={ProductPage}/>
+          <Route exact path="/product/:product" component={ProductPage}/>
           <Route path="*" component={NotFound}/>
         </Switch>
       </HashRouter>
