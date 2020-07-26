@@ -15,9 +15,12 @@ app.listen(8000, function () {
 app.get('/', function (request, response) {
   serveSPA(request, response, 'public/spa.html', 'text/html');
 });
+app.get('/panel', function (request, response) {
+  serveSPA(request, response, 'public/spa.html', 'text/html');
+});
 app.get('/api/product', async function (req, res, next) {
   await serveOneProduct(req, res);
-   next();
+  next();
 });
 app.get('/product/:key_and_slug', function (request, response) {
   serveSPA(request, response, 'public/spa.html', 'text/html');
@@ -69,8 +72,20 @@ async function serveProducts (req, res) {
 
 async function serveOneProduct (req, res/*, params*/) {
   let product;
+  const parsed = req.query;
+  let key = Object.getOwnPropertyNames(parsed)[0];
   try {
-    product = await ProductService.getProductByWhere(req.query);
+    let id = parsed[key];
+    if (key === 'id') {
+      if ((parseInt(id, 16) >= 0 || parseInt(id, 16) < 0) && unescape(encodeURIComponent(id)).length === 24) {
+        product = await ProductService.getProductById(id);
+      } else {
+        serveNotFound(req, res, 500, 'Ошибка сервера');
+        return;
+      }
+    } else {
+      product = await ProductService.getProductByWhere(parsed);
+    }
     res.json(product);
   } catch (e) {
     serveNotFound(req, res, 500, 'Ошибка сервера');

@@ -14,7 +14,7 @@ module.exports = {
           client
             .db('shop')
             .collection('product')
-            .findOne({ _id: mongodb.ObjectID(productId) },
+            .find({_id: mongodb.ObjectID(productId)}).toArray(
               (function (err, results) {
                 if (err) {
                   console.log(err.message());

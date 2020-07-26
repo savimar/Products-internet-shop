@@ -1,25 +1,18 @@
 import * as React from 'react'
-import Header from '../components/Header'
 import Footer from '../components/Footer'
 import Products from '../components/Products'
+import Header from '../components/Header'
 
-export default class IndexPage extends React.Component {
+export default class PanelPage extends React.Component {
 
   render () {
     return (
       <React.Fragment>
-        <Header css = {'header'}/>
-        <Products button ={"index"}/>
+        <Header css = {'headerPanel'}/>
+        <Products button ={"panel"}/>
         <Footer/>
       </React.Fragment>
     )
   }
 
 }
-
-
-
-
-
-
-

@@ -9,6 +9,7 @@ export default class Products extends React.Component {
       list: [],
       status: 'idle'
     }
+
   }
 
   renderProducts () {
@@ -67,6 +68,7 @@ export default class Products extends React.Component {
             <Breadcrumb/>
             {list.length ? (
               list.map((item, index) => (
+
                   <React.Fragment key={index}>
                     <div className="card mb-3">
                       <HashRouter>
@@ -74,7 +76,12 @@ export default class Products extends React.Component {
                         <img className="card-img-top" src={item.img} alt="img"></img>
                         <p className="card-text">{item.description}</p>
                         <p className="card-text"> Цена {item.price} руб.</p>
-                        <Link className="btn btn-primary" to={'/product/' + item.key + '-' + item.slug}>Купить</Link>
+                        {this.props.button === 'index' ? (
+                          <Link className="btn btn-primary" to={'/product/' + item.key + '-' + item.slug}>Купить</Link>
+                        ) : (
+                          <Link className="btn btn-primary" to={'/panel/product/' + item._id}>Купить</Link>
+                        )
+                        }
                       </HashRouter>
                     </div>
                   </React.Fragment>

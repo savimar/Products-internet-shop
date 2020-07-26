@@ -1,6 +1,7 @@
 import React from 'react'
 import Breadcrumb from './Breadcrumb'
 
+let path
 
 export default class Products extends React.Component {
   constructor (props) {
@@ -8,13 +9,20 @@ export default class Products extends React.Component {
     this.state = {
       products: [],
     }
+    if (this.props.prodKey !== undefined && this.props.prodKey !== null) {
+      path = '/api/product?key=' + this.props.prodKey
+    } else if (this.props.prodId !== undefined && this.props.prodId !== null) {
+      path = '/api/product?id=' + this.props.prodId
+    } else {
+      path = '/api/product?slag=bag'
+    }
   }
 
   renderProduct () {
     return (
-      fetch('/api/product?key=' + this.props.prodId)
+      fetch(path)
         .then(res => res.json())
-        .then(product => this.setState(state => ({
+        .then(product => this.setState(() => ({
           products: product
         })))
         .catch(error => {
@@ -30,13 +38,13 @@ export default class Products extends React.Component {
 
   render () {
     const { products } = this.state
-    return (
+     return (
       <main>
         <div className="container">
           <div className="box">
             <div className="content">
               <Breadcrumb/>
-              {products && products.length > 0 ? (
+              {products && products.length ? (
                 products.map((item, index) => (
                     <React.Fragment key={index}>
                       <h5 className="card-title">{item.title}</h5>

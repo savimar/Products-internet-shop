@@ -42,11 +42,15 @@ body {
 }
 
 
-header {
+.header {
     background-color: Black;
     font-size: 0;
 }
 
+.headerPanel {
+    background-color: Green;
+    font-size: 0;
+}
 
 .menu a {
     line-height: 50px;
@@ -54,7 +58,6 @@ header {
     font-family: Verdana, sans-serif;
     font-size: 14px;
     padding: 0 20px;
-
 }
 
 a {
