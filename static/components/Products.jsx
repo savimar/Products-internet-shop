@@ -68,7 +68,6 @@ export default class Products extends React.Component {
             <Breadcrumb/>
             {list.length ? (
               list.map((item, index) => (
-
                   <React.Fragment key={index}>
                     <div className="card mb-3">
                       <HashRouter>

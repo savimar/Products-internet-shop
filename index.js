@@ -6,7 +6,7 @@ const app = express();
 var path = require('path');
 app.use('/public/img', express.static(path.join(__dirname, '/public/img')));
 app.use('/public/css', express.static(path.join(__dirname, '/public/css')));
-app.use('/public/img/favicon.ico', express.static(path.join(__dirname, '/public/img/favicon.ico')));
+/*app.use('/public/img/favicon.ico', express.static(path.join(__dirname, '/public/img/favicon.ico')));*/
 
 app.listen(8000, function () {
   console.log('Сервер начал прослушивание запросов ');

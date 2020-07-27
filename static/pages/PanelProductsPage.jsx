@@ -18,7 +18,7 @@ export default class ProductPage extends React.Component {
     return (
       <React.Fragment>
         <Header css = {'headerPanel'}/>
-        <ProductBox prodId={id}/>
+        <ProductBox prodId={id} isEdit = {true}/>
         <Footer/>
       </React.Fragment>
     )
