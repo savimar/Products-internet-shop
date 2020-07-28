@@ -6,7 +6,7 @@ const queryString = require('query-string');
 
 
 
-function serveStatic (req, res, pathname) {
+async function serveStatic (req, res, pathname) {
   res.statusCode = 200;
   let type;
   let path;
@@ -37,12 +37,12 @@ function serveStatic (req, res, pathname) {
   }
 
   /* if exist file */
-  serveSPA(req, res, path, type);
+  await serveSPA(req, res, path, type);
 
 }
 
 
-function serveSPA (req, res, path, type) {
+async function serveSPA (req, res, path, type) {
   console.log('serveSpa');
   res.setHeader('Content-Type', type);
   try {
@@ -105,16 +105,15 @@ server.on('request', async (request, response) => {
     console.log('Путь', path);
 
     if (path.startsWith('/public/img')) {
-      serveStatic(request, response, path);
+     await serveStatic(request, response, path);
     } else if (path.startsWith('/public/css')) {
-      serveStatic(request, response, path);
+      await serveStatic(request, response, path);
     } else if (path.startsWith('/items')) {
       await serveAPI(request, response, path);
-      // redirect(request, response, path);
     } else if (path === '/public/bundle.js') {
       serveSPA(request, response, path.slice(1), 'text/javascript');
     } else if (path === '/favicon.ico') {
-      serveStatic(request, response, '/public/img/favicon.ico');
+     await serveStatic(request, response, '/public/img/favicon.ico');
     } else if (path === '/' || path === '/#/') {
       serveSPA(request, response, 'public/spa.html', 'text/html');
     } else if (path.startsWith('/api/product')) {
