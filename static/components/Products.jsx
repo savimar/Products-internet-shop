@@ -27,7 +27,7 @@ export default class Products extends React.Component {
               status: 'ready'
             })))
           )
-        }, 500)
+        }, 1000)
       }).catch(error => {
         console.error(error)
         this.setState(state => ({
@@ -49,7 +49,7 @@ export default class Products extends React.Component {
           Товары загружены
         </div>
       )
-    } else if (this.state.status === 'ready') {
+    } else if (this.state.status === 'error') {
       return (
         <div className="alert alert-danger" role="alert">
           Ошибка загрузки товаров
@@ -86,9 +86,17 @@ export default class Products extends React.Component {
                   </React.Fragment>
                 )
               )) : (
-              <div>
-                <h4>Идет поиск товара</h4>
-              </div>)
+              this.state.status === 'error' ?
+                (<div>
+                    <h4> Ошибка </h4>
+                  </div>
+                ) : (
+                  <div>
+                    <h4>Идет поиск товаров</h4>
+                  </div>
+                )
+            )
+            }
             }
             {this.renderElement()}
           </div>
