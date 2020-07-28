@@ -9,7 +9,6 @@ export default class ProductPage extends React.Component {
   constructor (props) {
     super(props)
     let productUrl = this.props.match.params.product
-    console.log(productUrl)
     let arr = productUrl.split('-')
     id = arr[0]
   }

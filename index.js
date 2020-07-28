@@ -2,6 +2,9 @@ const fs = require('fs');
 const ProductService = require('./ProductService.js');
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
+const jsonBodyParser = bodyParser("json");
+app.use(jsonBodyParser);
 
 var path = require('path');
 app.use('/public/img', express.static(path.join(__dirname, '/public/img')));
@@ -18,8 +21,8 @@ app.get('/', function (request, response) {
 app.get('/panel', function (request, response) {
   serveSPA(request, response, 'public/spa.html', 'text/html');
 });
-app.get('/api/product', async function (req, res, next) {
-  await serveOneProduct(req, res);
+app.get('/api/product', async function (request, response, next) {
+  await serveOneProduct(request, response);
   next();
 });
 app.get('/product/:key_and_slug', function (request, response) {
@@ -28,7 +31,12 @@ app.get('/product/:key_and_slug', function (request, response) {
 app.get('/public/bundle.js', function (request, response) {
   serveSPA(request, response, 'public/bundle.js', 'text/javascript');
 });
-
+app.put("/api/product/:id", function(request, response) {
+   ProductService.updateProduct(request.params.id, request.body)
+    .then(function(result) {
+      response.json(result);
+    });
+});
 app.get('/api/products', async function (request, response) {
   await serveProducts(request, response);
 });

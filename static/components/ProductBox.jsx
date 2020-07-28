@@ -2,6 +2,7 @@ import * as React from 'react'
 import Breadcrumb from './Breadcrumb'
 import { HashRouter } from 'react-router-dom'
 
+
 let path
 
 export default class Products extends React.Component {
@@ -10,11 +11,12 @@ export default class Products extends React.Component {
     super(props)
     this.state = {
       products: [],
+      beforeTitle:'',
       item: {
         title: 'Товар',
         descriptionFull: 'Описание',
-        key :'1',
-        slug :'bag'
+        key: 1,
+        slug: 'bag'
       }
     }
     this.getPath()
@@ -31,7 +33,7 @@ export default class Products extends React.Component {
 
   }
 
-  getProducts(products) {
+  getProducts (products) {
     return (
       <React.Fragment>
         {products && products.length ? (
@@ -54,82 +56,97 @@ export default class Products extends React.Component {
     )
   }
 
+  onSave (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    console.log(this.state.item);
+    fetch(`/api/product/${this.props.prodId}`, {
+      method: "put",
+      body: JSON.stringify(this.state.item),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }).then( res => res.json())
+      /*.then(prod => this.setState(() => ({
+        item: prod
+      })))*/
+      .catch(error => {
+        console.error(error)
+      })
+
+  }
+
   onChange (event) {
+
     event.preventDefault()
     event.stopPropagation()
-    const name = event.target.name;
-    console.log(name);
-    //var property = {...this.state.item}
+    const name = event.target.name
     switch (name) {
       case 'title':
-        this.state.item.title = event.target.value
-      break;
+        this.state.item.title = event.target.value;
+        break
       case 'descriptionFull':
-        this.state.item.descriptionFull = event.target.value;
-        break;
+        this.state.item.descriptionFull = event.target.value
+        break
       case 'key' :
-        this.state.item.key =  event.target.value;
-        break;
+        this.state.item.key = event.target.value
+        break
       case 'slug' :
-        this.state.item.slug = event.target.value;
-        break;
+        this.state.item.slug = event.target.value
+        break
       default :
-        break;
+        break
     }
 
     this.forceUpdate()
   }
 
-  renderForm(products) {
-
-
+  renderForm (products) {
     return (
       <React.Fragment>
         {products && products.length ? (
           products.map((item, index) => (
             <HashRouter>
-
-              <form key={index}>
-                <div className="form-group">
-                  <label htmlFor="formGroupExampleInput">Введите наименование товара</label>
-                  <input name="title" type="text" className="form-control"
-                         id="formGroupExampleInput"
-                         placeholder="Товар"
-                         value={this.state.item.title}
-                         onChange={this.onChange.bind(this)}></input>
-                </div>
-                <h5 className="card-title">{this.state.item.title}</h5>
-                <img className="card-img-top" src={item.img} alt="img"></img>
-                <div className="form-group">
-                  <label htmlFor="exampleFormControlTextarea1">Введите полное описание товара</label>
-                  <textarea name="descriptionFull" className="form-control"
-                            id="exampleFormControlTextarea1"
-                            placeholder="Описание" rows="3"
-                            value={this.state.item.descriptionFull}
-                            onChange={this.onChange.bind(this)}></textarea>
-                </div>
-                <p className="card-text">{this.state.item.descriptionFull}</p>
-                <p className="card-text"> Цена {item.price} руб.</p>
-                <div className="form-group">
-                  <label htmlFor="formGroupExampleInput">Введите ключ товара</label>
-                  <input name="key" type="text" className="form-control"
-                         id="formGroupExampleInput"
-                         placeholder="Товар"
-                         value={this.state.item.key}
-                         onChange={this.onChange.bind(this)}></input>
-                </div>
-                <p className="card-text"> {this.state.item.key}</p>
-                <div className="form-group">
-                  <label htmlFor="formGroupExampleInput">Введите ключевое наименование товара</label>
-                  <input name="slug" type="text" className="form-control"
-                         id="formGroupExampleInput"
-                         placeholder="Товар"
-                         value={this.state.item.slug}
-                         onChange={this.onChange.bind(this)}></input>
-                </div>
-                <p className="card-text"> {this.state.item.slug}</p>
-                <a href="#" className="btn btn-primary">Купить</a>
-              </form>
+              <React.Fragment key={index}>
+                <form>
+                  <div className="form-group">
+                    <p><label htmlFor="formGroupExampleInput">{item.title}</label></p>
+                    <p> <label htmlFor="formGroupExampleInput">Введите новое наименование товара</label></p>
+                    <input  placeholder={item.title} name="title" type="text" className="form-control"
+                           id="title"
+                           value={this.state.item.title}
+                           onChange={this.onChange.bind(this)}></input>
+                  </div>
+                  <h5 className="card-title">{this.state.item.title}</h5>
+                   <img className="card-img-top" src={item.img} alt="img"></img>
+                  <div className="form-group">
+                   <p> <label htmlFor="exampleFormControlTextarea1">Введите новое полное описание товара</label></p>
+                    <textarea placeholder={item.descriptionFull}
+                              name="descriptionFull" className="form-control"
+                              id="descriptionFull"
+                              rows="3"
+                              value={this.state.item.descriptionFull}
+                              onChange={this.onChange.bind(this)}></textarea>
+                  </div>
+                   <p className="card-text"> Цена {item.price} руб.</p>
+                  <div className="form-group">
+                    <p><label htmlFor="formGroupExampleInput">Введите числовой ключ товара</label></p>
+                    <input placeholder={item.key} name="key" type="text" className="form-control"
+                           id="key"
+                           value={this.state.item.key}
+                           onChange={this.onChange.bind(this)}></input>
+                  </div>
+                    <div className="form-group">
+                    <label htmlFor="formGroupExampleInput">Введите ключевое наименование товара</label>
+                    <input  placeholder={item.slug} name="slug" type="text" className="form-control"
+                           id="slug"
+                           value={this.state.item.slug}
+                           onChange={this.onChange.bind(this)}></input>
+                  </div>
+                  <p><a href="#" className="btn btn-primary">Купить</a></p>
+                  <p><button onClick={this.onSave.bind(this)} type="button" className="btn btn-success">Сохранить</button></p>
+                </form>
+              </React.Fragment>
             </HashRouter>)
           )) : (
           <div>
