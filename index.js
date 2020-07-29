@@ -23,7 +23,7 @@ app.get('/panel', function (request, response) {
 });
 app.get('/api/product', async function (request, response, next) {
   await serveOneProduct(request, response);
-  next();
+ next();
 });
 app.get('/product/:key_and_slug', function (request, response) {
   serveSPA(request, response, 'public/spa.html', 'text/html');
@@ -31,11 +31,15 @@ app.get('/product/:key_and_slug', function (request, response) {
 app.get('/public/bundle.js', function (request, response) {
   serveSPA(request, response, 'public/bundle.js', 'text/javascript');
 });
-app.put("/api/product/:id", function(request, response) {
-   ProductService.updateProduct(request.params.id, request.body)
-    .then(function(result) {
-      response.json(result);
-    });
+app.put("/api/product/:id",  async function(request, response) {
+  var result =   await  ProductService.updateProduct(request.params.id, request.body);
+      /*  .then(function(err, result) {
+        if(err) {
+          serveNotFound(request, response, 500, "ошибка изменения данных " );
+        }*/
+         console.log(result);
+         response.json(result);
+      //});
 });
 app.get('/api/products', async function (request, response) {
   await serveProducts(request, response);
@@ -62,9 +66,9 @@ function serveSPA (req, res, path, type) {
 
 function serveNotFound (req, res, code, message) {
   if (!message) {
-    message = 'Not found ' + code;
+     message = 'Not found ' + code;
   }
-  console.log('serveNotFound ' + code);
+  console.log( message + code);
   res.write(message);
 }
 

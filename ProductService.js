@@ -4,27 +4,44 @@ const lodash = require('lodash');
 let url = 'mongodb://localhost:27017';
 module.exports = {
 
-  updateProduct(id, patch) {
+   updateProduct: function (id, patch) {
     lodash.omit(patch, id);
     lodash.set(patch, 'key', Number.parseInt(patch['key']));
-    return new Promise((resolve, reject) => {
-      MongoClient
-        .connect(url, function (err, client) {
-          if (err) {
-            reject(err);
-          }
-          client
-            .db('shop')
-            .collection('product')
-            .update(
-            { _id: mongodb.ObjectID(id) },
-            {
-              $set: patch
-            }
-          );
+     return new Promise((resolve, reject) => {
+     MongoClient
+       .connect(url, function (err, client) {
+         if (err) {
+           reject(err);
+         }
+         client
+           .db('shop')
+           .collection('product')
+           // .initializeUnorderedBulkOp()
+           .findOneAndUpdate(
+             { _id: mongodb.ObjectID(id) },
+             {
+               $set: patch
+             },
+             {
+            //   new: true
+                new: true
+               //returnNewDocument: true,
+           //     returnOriginal: false
+             }, function (err, results) {
+               if (err) {
+                 console.log(err);
+                 reject(err);
+               }
+             //  console.log('Изменены данные');
+             //  console.log(results);
+               client.close();
+              // resolve(this.getProductById(id));
+             });
 
-        });
-    });
+       });
+        resolve(this.getProductById(id));
+   //   return this.getProductById(id);
+     } );
 
   },
 
@@ -40,7 +57,7 @@ module.exports = {
             .db('shop')
             .collection('product')
             .find({ _id: mongodb.ObjectID(productId) }).toArray(
-            (function (err, results) {
+            function (err, results) {
               if (err) {
                 console.log(err.message());
                 reject(err);
@@ -49,7 +66,7 @@ module.exports = {
               console.log(results);
               client.close();
               resolve(results);
-            }));
+            });
 
         });
     });
@@ -146,7 +163,7 @@ getProducts: function () {
         client
           .db('shop')
           .collection('product')
-          .find()
+           .find()
           .sort({ key: 1 })
           .toArray(function (err, results) {
             if (err) {

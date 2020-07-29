@@ -97,7 +97,7 @@ export default class Products extends React.Component {
                 )
             )
             }
-            }
+
             {this.renderElement()}
           </div>
         </div>

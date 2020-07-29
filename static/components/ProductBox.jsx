@@ -46,11 +46,9 @@ export default class Products extends React.Component {
                 <a href="#" className="btn btn-primary">Купить</a>
               </React.Fragment>
             )
-          )) : (
-          <div>
-            <h4>Идет поиск товара</h4>
-          </div>
-        )
+          )) :  (this.getErrorElement())
+        }
+        {this.renderElement()}
         }
       </React.Fragment>
     )
@@ -66,18 +64,20 @@ export default class Products extends React.Component {
       headers: {
         'Content-Type': 'application/json'
       }
-    }).then(res => res.json())
-      .then(prod => this.setState(() => ({
+    }).then(res => {
+      res.json();
+    }).then(prod => {
+      console.log(prod);
+      this.setState(() => ({
         item: prod
-      })))
+      }))})
       .catch(error => {
-        console.error(error)
+        console.log(error)
       })
 
   }
 
   onChange (event) {
-
     event.preventDefault()
     event.stopPropagation()
     const name = event.target.name
@@ -151,21 +151,23 @@ export default class Products extends React.Component {
                 </form>
               </React.Fragment>
             </HashRouter>)
-          )) : (
-          this.state.status === 'error' ?
-            (<div>
-                <h4> Ошибка </h4>
-              </div>
-            ) : (
-              <div>
-                <h4>Идет поиск товара</h4>
-              </div>
-            )
-        )
+          )) : (this.getErrorElement())
         }
         {this.renderElement()}
       </React.Fragment>
     )
+  }
+
+  getErrorElement() {
+    return this.state.status === 'error' ?
+      (<div>
+          <h4> Ошибка </h4>
+        </div>
+      ) : (
+        <div>
+          <h4>Идет поиск товара</h4>
+        </div>
+      )
   }
 
   renderProduct () {
