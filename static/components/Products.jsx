@@ -7,7 +7,16 @@ export default class Products extends React.Component {
     super(props)
     this.state = {
       list: [],
-      status: 'idle'
+      status: 'idle',
+      newProduct : {
+        title: undefined,
+        img : undefined, //"/public/img/product1.jpg",
+        description: undefined,
+        descriptionFull: undefined,
+        price:0,
+        key: 0,
+        slug: undefined
+      }
     }
 
   }
@@ -66,6 +75,10 @@ export default class Products extends React.Component {
         <div className="container">
           <div className="content">
             <Breadcrumb/>
+            {this.props.addNew ? (
+              this.addNewProduct()
+              ):(
+              <React.Fragment></React.Fragment>)}
             {list.length ? (
               list.map((item, index) => (
                   <React.Fragment key={index}>
@@ -106,4 +119,125 @@ export default class Products extends React.Component {
 
   }
 
+  addNewProduct () {
+return(
+  <form>
+    <p><h2>Добавление нового товара</h2></p>
+    <div className="form-group">
+      <p><label htmlFor="formGroupExampleInput">Введите новое наименование товара</label></p>
+      <input placeholder={this.state.newProduct.title} name="title" type="text" className="form-control"
+             id="title"
+             value={this.state.newProduct.title}
+             onChange={this.onChange.bind(this)}></input>
+    </div>
+    <div className="form-group">
+     <p><label htmlFor="formGroupExampleInput">Введите новый путь к изображению товара</label></p>
+      <input placeholder={this.state.newProduct.img} name="img" type="text" className="form-control"
+             id="img"
+             value={this.state.newProduct.img}
+             onChange={this.onChange.bind(this)}></input>
+    </div>
+
+    <div className="form-group">
+      <p><label htmlFor="exampleFormControlTextarea1">Введите новое краткое описание товара</label></p>
+      <textarea placeholder={this.state.newProduct.description}
+                name="description" className="form-control"
+                id="description"
+                rows="2"
+                value={this.state.newProduct.description}
+                onChange={this.onChange.bind(this)}></textarea>
+    </div>
+
+
+    <div className="form-group">
+      <p><label htmlFor="exampleFormControlTextarea1">Введите новое полное описание товара</label></p>
+      <textarea placeholder={this.state.newProduct.descriptionFull}
+                name="descriptionFull" className="form-control"
+                id="descriptionFull"
+                rows="3"
+                value={this.state.newProduct.descriptionFull}
+                onChange={this.onChange.bind(this)}></textarea>
+    </div>
+    <div className="form-group">
+      <p><label htmlFor="formGroupExampleInput">Введите цену товара (только число)</label></p>
+      <input placeholder={this.state.newProduct.price} name="price" type="text" className="form-control"
+             id="price"
+             value={this.state.newProduct.price}
+             onChange={this.onChange.bind(this)}></input>
+    </div>
+    <div className="form-group">
+      <p><label htmlFor="formGroupExampleInput">Введите числовой ключ товара</label></p>
+      <input placeholder={this.state.newProduct.key} name="key" type="text" className="form-control"
+             id="key"
+             value={this.state.newProduct.key}
+             onChange={this.onChange.bind(this)}></input>
+    </div>
+    <div className="form-group">
+      <label htmlFor="formGroupExampleInput">Введите ключевое наименование товара</label>
+      <input placeholder={this.state.newProduct.slug} name="slug" type="text" className="form-control"
+             id="slug"
+             value={this.state.newProduct.slug}
+             onChange={this.onChange.bind(this)}></input>
+    </div>
+     <p>
+      <button onClick={this.onSave.bind(this)} type="button" className="btn btn-success">Добавить
+      </button>
+    </p>
+  </form>
+)
+  }
+  onSave (event) {
+    event.preventDefault()
+    event.stopPropagation()
+    console.log(this.state.newProduct)
+    fetch(`/api/product/`, {
+      method: 'post',
+      body: JSON.stringify(this.state.newProduct),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(res => {
+      res.json();
+    }).then(prod => {
+      console.log(prod);
+      this.setState(() => ({
+        newProduct: prod
+      }))})
+      .catch(error => {
+        console.log(error)
+      })
+
+  }
+  onChange (event) {
+    event.preventDefault()
+    event.stopPropagation()
+    const name = event.target.name
+    switch (name) {
+      case 'title':
+        this.state.newProduct.title = event.target.value
+        break
+      case 'img':
+        this.state.newProduct.img = event.target.value
+        break
+      case 'description':
+        this.state.newProduct.description = event.target.value
+        break
+      case 'descriptionFull':
+        this.state.newProduct.descriptionFull = event.target.value
+        break
+      case 'key' :
+        this.state.newProduct.key = event.target.value
+        break
+      case 'price' :
+        this.state.newProduct.price = event.target.value
+        break
+      case 'slug' :
+        this.state.newProduct.slug = event.target.value
+        break
+      default :
+        break
+    }
+
+    this.forceUpdate()
+  }
 }

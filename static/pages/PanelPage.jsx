@@ -9,7 +9,7 @@ export default class PanelPage extends React.Component {
     return (
       <React.Fragment>
         <Header css = {'headerPanel'}/>
-        <Products button ={"panel"}/>
+        <Products button ={"panel"} addNew={false}/>
         <Footer/>
       </React.Fragment>
     )
