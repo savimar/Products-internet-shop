@@ -33,8 +33,12 @@ app.get('/public/bundle.js', function (request, response) {
 });
 app.put('/api/product/:id', async function (request, response) {
   var result = await ProductService.updateProduct(request.params.id, request.body);
-  console.log(result);
   response.json(result);
+
+});
+app.post('/api/product', async function (request, response) {
+  var result = await ProductService.createProduct(request.body);
+  response.json(result.ops[0]);
 
 });
 app.get('/api/products', async function (request, response) {

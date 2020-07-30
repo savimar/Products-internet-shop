@@ -33,7 +33,7 @@ module.exports = {
               });
 
         });
-     resolve(this.getProductById(id));
+      resolve(this.getProductById(id));
 
     });
 
@@ -171,6 +171,32 @@ module.exports = {
               resolve(results);
 
             });
+        });
+    });
+  },
+  createProduct: function (body) {
+    lodash.set(body, 'key', Number.parseInt(body['key']));
+    lodash.set(body, 'price', Number.parseInt(body['price']));
+    return new Promise((resolve, reject) => {
+      MongoClient
+        .connect(url, function (err, client) {
+          if (err) {
+            reject(err);
+          }
+          client
+            .db('shop')
+            .collection('product')
+            .insertOne(
+              body, {},
+              function (err, results) {
+                if (err) {
+                  console.log(err);
+                  reject(err);
+                }
+                console.log('Добавлены данные');
+                client.close();
+                resolve(results);
+              });
         });
     });
   }
