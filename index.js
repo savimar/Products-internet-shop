@@ -32,12 +32,12 @@ app.get('/public/bundle.js', function (request, response) {
   serveSPA(request, response, 'public/bundle.js', 'text/javascript');
 });
 app.put('/api/product/:id', async function (request, response) {
-  var result = await ProductService.updateProduct(request.params.id, request.body);
+  let result = await ProductService.updateProduct(request.params.id, request.body);
   response.json(result);
 
 });
 app.post('/api/product', async function (request, response) {
-  var result = await ProductService.createProduct(request.body);
+  let result = await ProductService.createProduct(request.body);
   response.json(result.ops[0]);
 
 });

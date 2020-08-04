@@ -198,28 +198,30 @@ export default class Products extends React.Component {
         'Content-Type': 'application/json'
       }
     }).then((res) => {
-      res.json()
+      return res.json()
     })
-      .then(data => { //data=== undefined, but PromiseValue is correct
-        /*this.setState(() => ({
-          list:  this.state.list.push(data)
-        }))*/
+      .then(data => {
+        this.setState(previousState => {
+          return {
+            list: [...previousState.list, data]
+          }
+        })
+      })
+      .then(
+        this.forceUpdate()
+      )
+      .then(
         this.setState(() => ({
           newProduct: {
             title: '',
-            img:'',// '/public/img/product1.jpg',
+            img: '',// '/public/img/product1.jpg',
             description: '',
             descriptionFull: '',
             price: 0,
             key: 0,
             slug: ''
           }
-        }))
-      })
-      .then(
-        this.renderProducts())
-      .then(
-        this.forceUpdate())
+        })))
       .catch(error => {
         console.log(error)
       })

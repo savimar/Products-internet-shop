@@ -46,7 +46,7 @@ export default class Products extends React.Component {
                 <a href="#" className="btn btn-primary">Купить</a>
               </React.Fragment>
             )
-          )) :  (this.getErrorElement())
+          )) : (this.getErrorElement())
         }
         {this.renderElement()}
         }
@@ -57,7 +57,7 @@ export default class Products extends React.Component {
   onSave (event) {
     event.preventDefault()
     event.stopPropagation()
-    console.log(this.state.item)
+
     fetch(`/api/product/${this.props.prodId}`, {
       method: 'put',
       body: JSON.stringify(this.state.item),
@@ -65,12 +65,12 @@ export default class Products extends React.Component {
         'Content-Type': 'application/json'
       }
     }).then(res => {
-      res.json();
+      return res.json()
     }).then(prod => {
-      console.log(prod);
       this.setState(() => ({
         item: prod
-      }))})
+      }))
+    })
       .catch(error => {
         console.log(error)
       })
@@ -158,7 +158,7 @@ export default class Products extends React.Component {
     )
   }
 
-  getErrorElement() {
+  getErrorElement () {
     return this.state.status === 'error' ?
       (<div>
           <h4> Ошибка </h4>
