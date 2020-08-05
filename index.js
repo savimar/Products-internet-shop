@@ -28,13 +28,27 @@ app.get('/api/product', async function (request, response, next) {
 app.get('/product/:key_and_slug', function (request, response) {
   serveSPA(request, response, 'public/spa.html', 'text/html');
 });
+app.get('/api/login2', function (request, response) {
+  response.cookie('user', 'spa@gmail.con', {
+    path: '/',
+    encode: String
+  });
+  response.sendStatus(200);
+  response.end;
+});
+app.get('/api/login', function (request, response) {
+  response.header(
+    'Set-Cookie', 'user = spa@gmail.con; path=/'
+  );
+  response.sendStatus(200);
+  response.end();
+});
 app.get('/public/bundle.js', function (request, response) {
   serveSPA(request, response, 'public/bundle.js', 'text/javascript');
 });
 app.put('/api/product/:id', async function (request, response) {
   let result = await ProductService.updateProduct(request.params.id, request.body);
   response.json(result);
-
 });
 app.post('/api/product', async function (request, response) {
   let result = await ProductService.createProduct(request.body);
@@ -69,7 +83,7 @@ function serveNotFound (req, res, code, message) {
     message = 'Not found ' + code;
   }
   console.log(message + code);
-  res.write(message);
+  res.send(message);
 }
 
 async function serveProducts (req, res) {
