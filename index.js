@@ -5,6 +5,8 @@ const app = express();
 const bodyParser = require('body-parser');
 const jsonBodyParser = bodyParser('json');
 app.use(jsonBodyParser);
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
 
 var path = require('path');
 app.use('/public/img', express.static(path.join(__dirname, '/public/img')));
@@ -42,6 +44,17 @@ app.get('/api/login', function (request, response) {
   );
   response.sendStatus(200);
   response.end();
+});
+app.get('/api/me', function (request, response) {
+  let result = undefined;
+  let cookiesObj = Object.entries(request.cookies);
+  cookiesObj.map(([key, value]) => key === 'user'? result = value : undefined);
+  if(result !== undefined){
+    response.send(result);
+  }else {
+    response.sendStatus(401);
+  }
+  response.end;
 });
 app.get('/public/bundle.js', function (request, response) {
   serveSPA(request, response, 'public/bundle.js', 'text/javascript');
