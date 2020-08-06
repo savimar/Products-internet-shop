@@ -199,7 +199,99 @@ module.exports = {
               });
         });
     });
-  }
+  },
+
+
+  getUsers: function () {
+    function createItems () {
+      return [
+        {
+          name: 'Ivan',
+          role: 'user',
+          email: 'spa2@mail.con',
+          key: 200,
+
+        },
+        {
+          name: 'Peter',
+          role: 'user',
+          email: 'spa1@mail.con',
+          key: 100,
+        },
+        {
+          name: 'Admin',
+          role: 'admin',
+          email: 'admin@mail.con',
+          key: 300,
+        }];
+    }
+
+    function createDB (collection) {
+      /* collection.drop(function (err, result) {
+         if (err) return console.log(err);
+         console.log('Удалена БД');
+       });*/
+      let creating = createItems();
+      collection.insertMany(creating, function (err, results) {
+        if (err) return console.log(err);
+        console.log('Создана БД');
+        console.log(results);
+
+      });
+    }
+
+    return new Promise((resolve, reject) => {
+      MongoClient
+        .connect(url, function (err, client) {
+          if (err) {
+            reject(err);
+          }
+          client
+            .db('shop')
+            .collection('user')
+            .find()
+            .sort({ key: 1 })
+            .toArray(function (err, results) {
+              if (err) {
+                reject(err);
+              }
+              console.log('Получены данные');
+              console.log(results);
+              if (results.length === 0) {
+                createDB(client.db('shop').collection('user'));
+              }
+              client.close();
+              resolve(results);
+
+            });
+        });
+    });
+  },
+  getUserByEmail: function (email) {
+    return new Promise((resolve, reject) => {
+      MongoClient
+        .connect(url, function (err, client) {
+          if (err) {
+            reject(err);
+          }
+          client
+            .db('shop')
+            .collection('user')
+            .findOne({ email: email },
+              function (err, results) {
+                if (err) {
+                  reject(err);
+                }
+                console.log('Получены данные');
+                console.log(results);
+                client.close();
+                resolve(results);
+              });
+
+        });
+    });
+
+  },
 };
 
 

@@ -1,11 +1,11 @@
 const fs = require('fs');
-const ProductService = require('./ProductService.js');
+const DBService = require('./DBService.js');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const jsonBodyParser = bodyParser('json');
 app.use(jsonBodyParser);
-const cookieParser = require("cookie-parser");
+const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
 var path = require('path');
@@ -38,21 +38,36 @@ app.get('/api/login2', function (request, response) {
   response.sendStatus(200);
   response.end;
 });
-app.get('/api/login', function (request, response) {
-  response.header(
-    'Set-Cookie', 'user = spa@gmail.con; path=/'
-  );
-  response.sendStatus(200);
+app.get('/api/login', async function (request, response) {
+  let users = await DBService.getUsers();
+
+  response.status(200);
+
+  for (let i = 0; i < users.length; i++) {
+    let user = users[i];
+    response.cookie(user.name, user.email, {
+      path: '/',
+      encode: String
+    });
+  }
+
+  //response.set(
+  // 'Set-Cookie', 'user = spa@gmail.con; path=/'
+  //);
   response.end();
 });
-app.get('/api/me', function (request, response) {
+app.get('/api/me', async function (request, response) {
   let result = undefined;
-  let cookiesObj = Object.entries(request.cookies);
-  cookiesObj.map(([key, value]) => key === 'user'? result = value : undefined);
-  if(result !== undefined){
+  for (const [key, value] of Object.entries(request.cookies)) {
+    let user = await DBService.getUserByEmail(value);
+    if (user !== null && key === user.name) {
+      result = value;
+    }
+  }
+  if (result !== undefined) {
     response.send(result);
-  }else {
-    response.sendStatus(401);
+  } else {
+    response.sendStatus(403);
   }
   response.end;
 });
@@ -60,11 +75,11 @@ app.get('/public/bundle.js', function (request, response) {
   serveSPA(request, response, 'public/bundle.js', 'text/javascript');
 });
 app.put('/api/product/:id', async function (request, response) {
-  let result = await ProductService.updateProduct(request.params.id, request.body);
+  let result = await DBService.updateProduct(request.params.id, request.body);
   response.json(result);
 });
 app.post('/api/product', async function (request, response) {
-  let result = await ProductService.createProduct(request.body);
+  let result = await DBService.createProduct(request.body);
   response.json(result.ops[0]);
 
 });
@@ -102,7 +117,7 @@ function serveNotFound (req, res, code, message) {
 async function serveProducts (req, res) {
   let products;
   try {
-    products = await ProductService.getProducts();
+    products = await DBService.getProducts();
     res.json(products);
   } catch (e) {
     serveNotFound(req, res, 500, 'Ошибка сервера');
@@ -117,13 +132,13 @@ async function serveOneProduct (req, res/*, params*/) {
     let id = parsed[key];
     if (key === 'id') {
       if ((parseInt(id, 16) >= 0 || parseInt(id, 16) < 0) && unescape(encodeURIComponent(id)).length === 24) {
-        product = await ProductService.getProductById(id);
+        product = await DBService.getProductById(id);
       } else {
         serveNotFound(req, res, 500, 'Ошибка сервера');
         return;
       }
     } else {
-      product = await ProductService.getProductByWhere(parsed);
+      product = await DBService.getProductByWhere(parsed);
     }
     res.json(product);
   } catch (e) {
