@@ -7,6 +7,10 @@ const jsonBodyParser = bodyParser('json');
 app.use(jsonBodyParser);
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
+const jwt = require("jsonwebtoken");
+const SECRET = "t5ry5r546lmklbvhohjip@r";
+
+
 
 var path = require('path');
 app.use('/public/img', express.static(path.join(__dirname, '/public/img')));
@@ -40,20 +44,34 @@ app.get('/api/login2', function (request, response) {
 });
 app.get('/api/login', async function (request, response) {
   let users = await DBService.getUsers();
-
   response.status(200);
-
   for (let i = 0; i < users.length; i++) {
     let user = users[i];
-    response.cookie(user.name, user.email, {
+
+    const payload = {
+      email: user.email
+    };
+    const token = jwt.sign(payload, SECRET, {
+      expiresIn: "5m"
+    });
+    response.cookie( 'token', token, {
       path: '/',
       encode: String
     });
-  }
+   }
 
-  //response.set(
-  // 'Set-Cookie', 'user = spa@gmail.con; path=/'
-  //);
+
+  /*for (let i = 0; i < users.length; i++) {
+    let user = users[i];
+     response.cookie(user.name, user.email, {
+      path: '/',
+      encode: String
+    });
+   }*/
+
+  /*response.header(
+    'Set-Cookie', 'user = spa@gmail.con; path=/'
+  );*/
   response.end();
 });
 app.get('/api/me', async function (request, response) {

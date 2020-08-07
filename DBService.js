@@ -206,19 +206,6 @@ module.exports = {
     function createItems () {
       return [
         {
-          name: 'Ivan',
-          role: 'user',
-          email: 'spa2@mail.con',
-          key: 200,
-
-        },
-        {
-          name: 'Peter',
-          role: 'user',
-          email: 'spa1@mail.con',
-          key: 100,
-        },
-        {
           name: 'Admin',
           role: 'admin',
           email: 'admin@mail.con',
