@@ -7,10 +7,8 @@ const jsonBodyParser = bodyParser('json');
 app.use(jsonBodyParser);
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
-const jwt = require("jsonwebtoken");
-const SECRET = "t5ry5r546lmklbvhohjip@r";
-
-
+const jwt = require('jsonwebtoken');
+const SECRET = 't5ry5r546lmklbvhohjip@r';
 
 var path = require('path');
 app.use('/public/img', express.static(path.join(__dirname, '/public/img')));
@@ -47,45 +45,36 @@ app.get('/api/login', async function (request, response) {
   response.status(200);
   for (let i = 0; i < users.length; i++) {
     let user = users[i];
-
     const payload = {
       email: user.email
     };
     const token = jwt.sign(payload, SECRET, {
-      expiresIn: "5m"
+      expiresIn: '5m'
     });
-    response.cookie( 'token', token, {
+    response.cookie('token', token, {
       path: '/',
       encode: String
     });
-   }
+  }
 
-
-  /*for (let i = 0; i < users.length; i++) {
-    let user = users[i];
-     response.cookie(user.name, user.email, {
-      path: '/',
-      encode: String
-    });
-   }*/
-
-  /*response.header(
-    'Set-Cookie', 'user = spa@gmail.con; path=/'
-  );*/
   response.end();
 });
 app.get('/api/me', async function (request, response) {
-  let result = undefined;
   for (const [key, value] of Object.entries(request.cookies)) {
-    let user = await DBService.getUserByEmail(value);
-    if (user !== null && key === user.name) {
-      result = value;
+    if (key === 'token') {
+      try {
+        const payload = jwt.verify(value, SECRET);
+        if (payload.email !== null || payload.email !== undefined) {
+          const email = payload.email;
+          const user = await DBService.getUserByEmail(email);
+          response.send(user.name);
+        } else {
+          response.sendStatus(403);
+        }
+      } catch (err) {
+        response.sendStatus(403);
+      }
     }
-  }
-  if (result !== undefined) {
-    response.send(result);
-  } else {
-    response.sendStatus(403);
   }
   response.end;
 });
