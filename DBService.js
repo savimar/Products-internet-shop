@@ -201,14 +201,14 @@ module.exports = {
     });
   },
 
-
   getUsers: function () {
     function createItems () {
       return [
         {
+          // password:123456
           name: 'Admin',
           role: 'admin',
-          password: '123456',
+          passwordHash: '$2b$10$qOz6O3sJRumuVqYaua1vn.7UYL9Dvw7prBsbstwoLlKuyIjQAuPLq',
           email: 'admin@mail.con',
           key: 300,
         }];
@@ -277,6 +277,40 @@ module.exports = {
               });
 
         });
+    });
+
+  },
+  updateUser: function (id, patch) {
+    lodash.omit(patch, id);
+    lodash.set(patch, 'key', Number.parseInt(patch['key']));
+    return new Promise((resolve, reject) => {
+      MongoClient
+        .connect(url, function (err, client) {
+          if (err) {
+            reject(err);
+          }
+          client
+            .db('shop')
+            .collection('user')
+            .findOneAndUpdate(
+              { _id: mongodb.ObjectID(id) },
+              {
+                $set: patch
+              },
+              {
+                new: true
+              }, function (err, results) {
+                if (err) {
+                  console.log(err);
+                  reject(err);
+                }
+                client.close();
+
+              });
+
+        });
+      resolve(this.getUserByEmail(patch.email));
+
     });
 
   },

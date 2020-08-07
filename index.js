@@ -9,6 +9,8 @@ const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 const jwt = require('jsonwebtoken');
 const SECRET = 't5ry5r546lmklbvhohjip@r';
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 var path = require('path');
 app.use('/public/img', express.static(path.join(__dirname, '/public/img')));
@@ -40,51 +42,23 @@ app.get('/api/login2', function (request, response) {
   response.sendStatus(200);
   response.end;
 });
-
-app.get('/api/login', async function (request, response) {
-  let users = await DBService.getUsers();
-  response.status(200);
-  for (let i = 0; i < users.length; i++) {
-    let user = users[i];
-    const payload = {
-      email: user.email
-    };
-    const token = jwt.sign(payload, SECRET, {
-      expiresIn: '5m'
-    });
-    const querry = request.query;
-   if(Object.keys(querry).length > 0 &&  querry.email !== undefined && querry.password !== undefined && querry.email === user.email && querry.password === user.password){
-    response.cookie('token', token, {
-      path: '/',
-      encode: String
-    });
-    response.send("Токен авторизации создан для пользователя " + user.name);
+app.get('/api/bcrypt', async function (request, response) {
+  const query = request.query;
+  if (Object.keys(query).length > 0 && query.email !== undefined && query.password !== undefined) {
+    const user = await DBService.getUserByEmail(query.email);
+    user.passwordHash = await bcrypt.hash(query.password, saltRounds);
+    response.sendStatus(200);
+    await DBService.updateUser(user._id, user);
   } else {
-     response.status(403);
-     response.send ("Неправильные данные для авторизации");
-   }
-  }
-
-  response.end();
-});
-app.get('/api/me', async function (request, response) {
-  for (const [key, value] of Object.entries(request.cookies)) {
-    if (key === 'token') {
-      try {
-        const payload = jwt.verify(value, SECRET);
-        if (payload.email !== null || payload.email !== undefined) {
-          const email = payload.email;
-          const user = await DBService.getUserByEmail(email);
-          response.send(user.name);
-        } else {
-          response.sendStatus(403);
-        }
-      } catch (err) {
-        response.sendStatus(403);
-      }
-    }
+    response.sendStatus(403);
   }
   response.end;
+});
+app.get('/api/login', async function (request, response) {
+  await getToken(response, request);
+});
+app.get('/api/me', async function (request, response) {
+  await verifyToken(request, response);
 });
 app.get('/public/bundle.js', function (request, response) {
   serveSPA(request, response, 'public/bundle.js', 'text/javascript');
@@ -102,6 +76,58 @@ app.get('/api/products', async function (request, response) {
   await serveProducts(request, response);
 });
 app.use(serveNotFound);
+
+async function getToken (response, request) {
+  let users = await DBService.getUsers();
+  response.status(200);
+  for (let i = 0; i < users.length; i++) {
+    let user = users[i];
+    const payload = {
+      email: user.email
+    };
+    const token = jwt.sign(payload, SECRET, {
+      expiresIn: '5m'
+    });
+    const query = request.query;
+    if (Object.keys(query).length > 0
+      && query.email !== undefined
+      && query.password !== undefined
+      && query.email === user.email) {
+      const res = await bcrypt.compare(query.password, user.passwordHash);
+      if(res) {
+        response.cookie('token', token, {
+          path: '/',
+          encode: String
+        });
+        response.send('Токен авторизации создан для пользователя ' + user.name);
+      }
+    } else {
+      response.status(403);
+      response.send('Неправильные данные для авторизации');
+    }
+  }
+  response.end();
+}
+
+async function verifyToken (request, response) {
+  for (const [key, value] of Object.entries(request.cookies)) {
+    if (key === 'token') {
+      try {
+        const payload = jwt.verify(value, SECRET);
+        if (payload.email !== null || payload.email !== undefined) {
+          const email = payload.email;
+          const user = await DBService.getUserByEmail(email);
+          response.send(user.name);
+        } else {
+          response.sendStatus(403);
+        }
+      } catch (err) {
+        response.sendStatus(403);
+      }
+    }
+  }
+  response.end;
+}
 
 function serveSPA (req, res, path, type) {
   console.log('serveSpa');
