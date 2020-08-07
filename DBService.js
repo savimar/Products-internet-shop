@@ -208,6 +208,7 @@ module.exports = {
         {
           name: 'Admin',
           role: 'admin',
+          password: '123456',
           email: 'admin@mail.con',
           key: 300,
         }];

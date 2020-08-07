@@ -40,6 +40,7 @@ app.get('/api/login2', function (request, response) {
   response.sendStatus(200);
   response.end;
 });
+
 app.get('/api/login', async function (request, response) {
   let users = await DBService.getUsers();
   response.status(200);
@@ -51,10 +52,17 @@ app.get('/api/login', async function (request, response) {
     const token = jwt.sign(payload, SECRET, {
       expiresIn: '5m'
     });
+    const querry = request.query;
+   if(Object.keys(querry).length > 0 &&  querry.email !== undefined && querry.password !== undefined && querry.email === user.email && querry.password === user.password){
     response.cookie('token', token, {
       path: '/',
       encode: String
     });
+    response.send("Токен авторизации создан для пользователя " + user.name);
+  } else {
+     response.status(403);
+     response.send ("Неправильные данные для авторизации");
+   }
   }
 
   response.end();
