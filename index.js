@@ -27,9 +27,8 @@ app.get('/', function (request, response) {
 app.get('/panel', function (request, response) {
   serveSPA(request, response, 'public/spa.html', 'text/html');
 });
-app.get('/api/product', async function (request, response, next) {
+app.get('/api/product', async function (request, response) {
   await serveOneProduct(request, response);
-  next();
 });
 app.get('/product/:key_and_slug', function (request, response) {
   serveSPA(request, response, 'public/spa.html', 'text/html');
@@ -57,16 +56,19 @@ app.get('/api/bcrypt', async function (request, response) {
 app.get('/api/login', async function (request, response) {
   await getToken(response, request);
 });
+app.get('/api/me', verifyToken);
 app.get('/api/me', async function (request, response) {
-  await verifyToken(request, response);
+  response.send(request.email);
 });
 app.get('/public/bundle.js', function (request, response) {
   serveSPA(request, response, 'public/bundle.js', 'text/javascript');
 });
+app.put("/api/product/:id", verifyToken);
 app.put('/api/product/:id', async function (request, response) {
   let result = await DBService.updateProduct(request.params.id, request.body);
   response.json(result);
 });
+app.post('/api/product',verifyToken);
 app.post('/api/product', async function (request, response) {
   let result = await DBService.createProduct(request.body);
   response.json(result.ops[0]);
@@ -94,7 +96,7 @@ async function getToken (response, request) {
       && query.password !== undefined
       && query.email === user.email) {
       const res = await bcrypt.compare(query.password, user.passwordHash);
-      if(res) {
+      if (res) {
         response.cookie('token', token, {
           path: '/',
           encode: String
@@ -109,20 +111,24 @@ async function getToken (response, request) {
   response.end();
 }
 
-async function verifyToken (request, response) {
+async function verifyToken (request, response, next) {
   for (const [key, value] of Object.entries(request.cookies)) {
     if (key === 'token') {
       try {
         const payload = jwt.verify(value, SECRET);
         if (payload.email !== null || payload.email !== undefined) {
-          const email = payload.email;
-          const user = await DBService.getUserByEmail(email);
-          response.send(user.name);
+          const user = await DBService.getUserByEmail(payload.email);
+          if (user != null || user !== undefined) {
+            request.email = user.email;
+            next();
+          } else {
+            Error('Нет такого пользователя');
+          }
         } else {
-          response.sendStatus(403);
+          Error('Нет e-mail');
         }
       } catch (err) {
-        response.sendStatus(403);
+        response.status(403).send({ err });
       }
     }
   }
