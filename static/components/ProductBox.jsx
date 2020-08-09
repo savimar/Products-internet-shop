@@ -28,7 +28,7 @@ export default class Products extends React.Component {
     } else if (this.props.prodId !== undefined && this.props.prodId !== null) {
       path = '/api/product?id=' + this.props.prodId
     } else {
-      path = '/api/product?slag=bag'
+      path = '/api/product?slug=bag'
     }
 
   }
@@ -59,13 +59,18 @@ export default class Products extends React.Component {
     event.stopPropagation()
 
     fetch(`/api/product/${this.props.prodId}`, {
-      method: 'put', credentials: "same-origin",
+      method: 'put',
+      credentials: 'same-origin',
       body: JSON.stringify(this.state.item),
       headers: {
         'Content-Type': 'application/json'
       }
     }).then(res => {
-      return res.json()
+      if (res.status !== 200) {
+        return window.location = '/#/panel/login'
+      } else {
+        return res.json()
+      }
     }).then(prod => {
       this.setState(() => ({
         item: prod
@@ -176,7 +181,13 @@ export default class Products extends React.Component {
     }))
     return (
       fetch(path)
-        .then(res => res.json())
+        .then(res => {
+          if (path.startsWith('/api/product?id=') && res.status !== 200) {
+            return window.location = '/#/panel/login'
+          } else {
+            return res.json()
+          }
+        })
         .then(product => this.setState(() => ({
           products: product
         })))

@@ -30,7 +30,13 @@ export default class Products extends React.Component {
       new Promise(resolve => {
         setTimeout(() => {
           resolve(fetch('/api/products')
-            .then(res => res.json())
+            .then(res => {
+              if (this.props.button === 'panel' && res.status !== 200) {
+                return window.location = '/#/panel/login'
+              } else {
+                return res.json()
+              }
+            })
             .then(list => this.setState({ list }))
             .then(() => this.setState(state => ({
               status: 'ready'
@@ -192,13 +198,18 @@ export default class Products extends React.Component {
     event.preventDefault()
     event.stopPropagation()
     fetch(`/api/product/`, {
-      method: 'post', credentials: "same-origin",
+      method: 'post',
+      credentials: 'same-origin',
       body: JSON.stringify(this.state.newProduct),
       headers: {
         'Content-Type': 'application/json'
       }
     }).then((res) => {
-      return res.json()
+      if (this.props.button === 'panel' && res.status !== 200) {
+        return window.location = '/#/panel/login'
+      } else {
+        return res.json()
+      }
     })
       .then(data => {
         this.setState(previousState => {

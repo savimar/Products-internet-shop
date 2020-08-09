@@ -43,16 +43,22 @@ app.get('/api/login2', function (request, response) {
   response.end;
 });
 app.get('/api/bcrypt', async function (request, response) {
-  const query = request.query;
-  if (Object.keys(query).length > 0 && query.email !== undefined && query.password !== undefined) {
-    const user = await DBService.getUserByEmail(query.email);
-    user.passwordHash = await bcrypt.hash(query.password, saltRounds);
-    response.sendStatus(200);
-    await DBService.updateUser(user._id, user);
-  } else {
+  try {
+    const query = request.query;
+    if (Object.keys(query).length > 0 && query.email !== undefined && query.password !== undefined) {
+      const user = await DBService.getUserByEmail(query.email);
+      user.passwordHash = await bcrypt.hash(query.password, saltRounds);
+      await DBService.updateUser(user._id, user);
+      response.sendStatus(200);
+    } else {
+      response.sendStatus(403);
+    }
+  } catch (e) {
     response.sendStatus(403);
+  } finally {
+    response.end;
   }
-  response.end;
+
 });
 app.post('/api/login', async function (request, response) {
   let result = await getToken(response, request);
@@ -65,16 +71,23 @@ app.get('/api/me', async function (request, response) {
 app.get('/public/bundle.js', function (request, response) {
   serveSPA(request, response, 'public/bundle.js', 'text/javascript');
 });
-app.put("/api/product/:id", verifyToken);
+app.put('/api/product/:id', verifyToken);
 app.put('/api/product/:id', async function (request, response) {
-  let result = await DBService.updateProduct(request.params.id, request.body);
-  response.json(result);
+  if (response.statusCode === 200) {
+    let result = await DBService.updateProduct(request.params.id, request.body);
+    response.json(result);
+  } else {
+    response.json(response.statusText);
+  }
 });
-app.post('/api/product',verifyToken);
+app.post('/api/product', verifyToken);
 app.post('/api/product', async function (request, response) {
-  let result = await DBService.createProduct(request.body);
-  response.json(result.ops[0]);
-
+  if (response.statusCode === 200) {
+    let result = await DBService.createProduct(request.body);
+    response.json(result.ops[0]);
+  } else {
+    response.json(response.statusText);
+  }
 });
 app.get('/api/products', async function (request, response) {
   await serveProducts(request, response);
@@ -103,7 +116,7 @@ async function getToken (response, request) {
           path: '/',
           encode: String
         });
-       // response.send('Токен авторизации создан для пользователя ' + user.name);
+        // response.send('Токен авторизации создан для пользователя ' + user.name);
         return user;
       }
     } else {
@@ -115,22 +128,17 @@ async function getToken (response, request) {
 }
 
 async function verifyToken (request, response, next) {
-// const cookies = Cookie.parse(document.cookie);
+  response.status(403);
   for (const [key, value] of Object.entries(request.cookies)) {
     if (key === 'token') {
       try {
-       const payload = jwt.verify(value, SECRET);
-      //  const payload = jwt.decode(cookies.token);
+        const payload = jwt.verify(value, SECRET);
         if (payload.email !== null || payload.email !== undefined) {
           const user = await DBService.getUserByEmail(payload.email);
           if (user != null || user !== undefined) {
+            response.status(200);
             request.email = user.email;
-            next();
-          } else {
-            Error('Нет такого пользователя');
           }
-        } else {
-          Error('Нет e-mail');
         }
       } catch (err) {
         response.status(403).send({ err });
@@ -138,6 +146,7 @@ async function verifyToken (request, response, next) {
     }
   }
   response.end;
+  next();
 }
 
 function serveSPA (req, res, path, type) {

@@ -20,21 +20,22 @@ export default class Login extends React.Component {
 
   checkCookie () {
     try {
-      const cookies = Cookie.parse(document.cookie)
-      const payload = decode(cookies.token)
+      const cookies = Cookie.parse(document.cookie);
+      const payload = decode(cookies.token);
       // const payload = jwt.decode(cookies.token)
-      const timestampInMilliseconds = new Date().getTime()
-      const exp = (timestampInMilliseconds / 1000) < payload.exp
+      const timestampInMilliseconds = new Date().getTime();
+      const exp = (timestampInMilliseconds / 1000) < payload.exp;
       if (exp) {
-        return 'logged'
+        return 'logged';
       } else {
-        return 'igle'
+        return 'idle';
       }
     } catch (e) {
+      return 'idle';
     }
   }
 
-  onSave (event) {
+  onGetAuth (event) {
     event.preventDefault()
     event.stopPropagation()
     this.setState(state => ({
@@ -48,11 +49,18 @@ export default class Login extends React.Component {
         'Content-Type': 'application/json'
       }
     }).then(res => {
-      return res.json()
-    }).then(prod => {
-      this.setState(() => ({
-        status: 'logged'
-      }))
+      return /*res.json()*/ res.status
+    }).then(status => {
+      if( status === 200){
+        this.setState(() => ({
+          status: 'logged'
+        }))
+      } else{
+        this.setState(() => ({
+          status: 'error'
+        }))
+      }
+
     }).catch(error => {
       this.setState(() => ({
         status: 'error'
@@ -99,7 +107,7 @@ export default class Login extends React.Component {
     } else if (this.state.status === 'error') {
       return (
         <div className="alert alert-danger" role="alert">
-          Ошибка авторизации
+          Ошибка авторизации. Введите логин и пароль еще раз.
         </div>
       )
     }
@@ -116,7 +124,7 @@ export default class Login extends React.Component {
             <div className="box">
               <div className="content">
                 <Breadcrumb/>
-                {this.renderElement()}
+                <div> {this.renderElement()}</div>
                 <button className="btn btn-primary" onClick={this.onGoOut.bind(this)}>Выйти</button>
               </div>
             </div>
@@ -134,9 +142,10 @@ export default class Login extends React.Component {
           <div className="box">
             <div className="content">
               <Breadcrumb/>
-              {
+              <div>{
                 this.renderElement()
               }
+              </div>
               <form>
                 <h2>Авторизация</h2>
                 <div className="form-group">
@@ -153,7 +162,7 @@ export default class Login extends React.Component {
                          onChange={this.onChange.bind(this)}></input>
                 </div>
                 <p>
-                  <button type="button" className="btn btn-primary" onClick={this.onSave.bind(this)}>Войти
+                  <button type="button" className="btn btn-primary" onClick={this.onGetAuth.bind(this)}>Войти
                   </button>
                 </p>
               </form>
