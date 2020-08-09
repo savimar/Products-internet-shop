@@ -1,20 +1,36 @@
 import React from 'react'
 import Breadcrumb from './Breadcrumb'
-import { Redirect, Router } from 'react-router'
-//import { HashRouter } from 'react-router-dom'
-import { createBrowserHistory, createHashHistory } from 'history'
-import { HashRouter, Link } from 'react-router-dom'
+/*import jwt from 'jsonwebtoken'*/
+const Cookie = require('cookie')
+import decode from 'jwt-decode'
 
 export default class Login extends React.Component {
 
   constructor (props) {
     super(props)
     this.state = {
-      status: 'idle',
+      status: this.checkCookie(),
       credentials: {
         login: 'admin@mail.con',
         password: '123456'
       }
+    }
+
+  }
+
+  checkCookie () {
+    try {
+      const cookies = Cookie.parse(document.cookie)
+      const payload = decode(cookies.token)
+      // const payload = jwt.decode(cookies.token)
+      const timestampInMilliseconds = new Date().getTime()
+      const exp = (timestampInMilliseconds / 1000) < payload.exp
+      if (exp) {
+        return 'logged'
+      } else {
+        return 'igle'
+      }
+    } catch (e) {
     }
   }
 
@@ -34,21 +50,14 @@ export default class Login extends React.Component {
     }).then(res => {
       return res.json()
     }).then(prod => {
-      /*this.setState(() => ({
-        credentials :{login : prod.email}
-      }))
-      console.log(this.state.credentials);*/
-       this.setState(() => ({
+      this.setState(() => ({
         status: 'logged'
       }))
-        console.log(this.state.status)
-
-    }) .catch(error => {
-     //   console.log(error)
-        this.setState(() => ({
-          status: 'error'
-        }))
-      })
+    }).catch(error => {
+      this.setState(() => ({
+        status: 'error'
+      }))
+    })
   }
 
   onChange (event) {
@@ -70,8 +79,17 @@ export default class Login extends React.Component {
     this.forceUpdate()
   }
 
+  onGoOut (event) {
+    event.preventDefault()
+    event.stopPropagation()
+    document.cookie = 'token=; Path=/; Max-Age=0;'
+    this.setState(() => ({
+      status: 'igle'
+    }))
+    this.forceUpdate()
+  }
+
   renderElement () {
-    console.log(this.state.status)
     if (this.state.status === 'logged') {
       return (
         <div className="alert alert-success" role="alert">
@@ -92,20 +110,18 @@ export default class Login extends React.Component {
     if (this.state.status !== 'logged') {
       return this.getLoginForm()
     } else {
-      return(
-      <main>
-        <div className="container">
-          <div className="box">
-            <div className="content">
-              <HashRouter>
-              <Breadcrumb/>
-              {this.renderElement()}
-                <Link className="btn btn-primary" to={'/panel'}>Войти в панель управления</Link>
-              </HashRouter>
+      return (
+        <main>
+          <div className="container">
+            <div className="box">
+              <div className="content">
+                <Breadcrumb/>
+                {this.renderElement()}
+                <button className="btn btn-primary" onClick={this.onGoOut.bind(this)}>Выйти</button>
+              </div>
             </div>
           </div>
-        </div>
-      </main>
+        </main>
       )
     }
 
@@ -122,7 +138,7 @@ export default class Login extends React.Component {
                 this.renderElement()
               }
               <form>
-                <p><h2>Авторизация</h2></p>
+                <h2>Авторизация</h2>
                 <div className="form-group">
                   <label htmlFor="login">E-mail</label>
                   <input placeholder='login' name="login" type="text" className="form-control"
@@ -130,7 +146,7 @@ export default class Login extends React.Component {
                          value={this.state.credentials.login}
                          onChange={this.onChange.bind(this)}></input>
                 </div>
-                <div class="form-group">
+                <div className="form-group">
                   <label htmlFor="password">Пароль</label>
                   <input type="password" className="form-control" id="password" type="text"
                          value={this.state.credentials.password} placeholder="password"

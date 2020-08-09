@@ -11,6 +11,7 @@ const jwt = require('jsonwebtoken');
 const SECRET = 't5ry5r546lmklbvhohjip@r';
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const Cookie = require('cookie');
 
 var path = require('path');
 app.use('/public/img', express.static(path.join(__dirname, '/public/img')));
@@ -114,10 +115,12 @@ async function getToken (response, request) {
 }
 
 async function verifyToken (request, response, next) {
+// const cookies = Cookie.parse(document.cookie);
   for (const [key, value] of Object.entries(request.cookies)) {
     if (key === 'token') {
       try {
-        const payload = jwt.verify(value, SECRET);
+       const payload = jwt.verify(value, SECRET);
+      //  const payload = jwt.decode(cookies.token);
         if (payload.email !== null || payload.email !== undefined) {
           const user = await DBService.getUserByEmail(payload.email);
           if (user != null || user !== undefined) {
