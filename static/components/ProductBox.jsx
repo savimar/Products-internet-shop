@@ -59,7 +59,7 @@ export default class Products extends React.Component {
     event.stopPropagation()
 
     fetch(`/api/product/${this.props.prodId}`, {
-      method: 'put',
+      method: 'put', credentials: "same-origin",
       body: JSON.stringify(this.state.item),
       headers: {
         'Content-Type': 'application/json'

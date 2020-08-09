@@ -53,8 +53,9 @@ app.get('/api/bcrypt', async function (request, response) {
   }
   response.end;
 });
-app.get('/api/login', async function (request, response) {
-  await getToken(response, request);
+app.post('/api/login', async function (request, response) {
+  let result = await getToken(response, request);
+  response.json(result);
 });
 app.get('/api/me', verifyToken);
 app.get('/api/me', async function (request, response) {
@@ -90,18 +91,19 @@ async function getToken (response, request) {
     const token = jwt.sign(payload, SECRET, {
       expiresIn: '5m'
     });
-    const query = request.query;
+    const query = request.body;
     if (Object.keys(query).length > 0
-      && query.email !== undefined
+      && query.login !== undefined
       && query.password !== undefined
-      && query.email === user.email) {
-      const res = await bcrypt.compare(query.password, user.passwordHash);
-      if (res) {
+      && query.login === user.email) {
+      const result = await bcrypt.compare(query.password, user.passwordHash);
+      if (result) {
         response.cookie('token', token, {
           path: '/',
           encode: String
         });
-        response.send('Токен авторизации создан для пользователя ' + user.name);
+       // response.send('Токен авторизации создан для пользователя ' + user.name);
+        return user;
       }
     } else {
       response.status(403);

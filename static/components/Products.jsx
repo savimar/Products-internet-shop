@@ -192,7 +192,7 @@ export default class Products extends React.Component {
     event.preventDefault()
     event.stopPropagation()
     fetch(`/api/product/`, {
-      method: 'post',
+      method: 'post', credentials: "same-origin",
       body: JSON.stringify(this.state.newProduct),
       headers: {
         'Content-Type': 'application/json'
