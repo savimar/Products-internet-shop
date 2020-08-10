@@ -49,7 +49,7 @@ export default class Products extends React.Component {
           )) : (this.getErrorElement())
         }
         {this.renderElement()}
-        }
+
       </React.Fragment>
     )
   }
