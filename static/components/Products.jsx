@@ -2,12 +2,42 @@ import React from 'react'
 import Breadcrumb from '../components/Breadcrumb'
 import { HashRouter, Link } from 'react-router-dom'
 
+
+const statusIdle = 'idle';
+const statusPending = 'pending';
+const statusReady ='ready'
+const statusError ='error'
+const statusCodeOK = 200;
+const caption = 'Добавление нового товара';
+
+const panelLogin = '/#/panel/login';
+const buttonBuy = 'Купить';
+const buttonUpdate = 'Изменить';
+const labelTitle = 'Введите новое наименование товара';
+const labelIMG = 'Введите новый путь к изображению товара';
+const labelDescription = 'Введите новое краткое описание товара';
+const labelDescriptionFull = 'Введите новое полное описание товара';
+const labelKey = 'Введите числовой ключ товара';
+const labelSlug = 'Введите ключевое наименование товара';
+const labelPrice = 'Введите цену товара (только число)';
+const mistake = 'Ошибка';
+const search ='Идет поиск товаров';
+const load =  'Товары загружены';
+const loadError = 'Ошибка загрузки товаров';
+const formTitle = 'title';
+const formDescriptionFull = 'descriptionFull';
+const formDescription = 'description';
+const formKey = 'key';
+const formSlug = 'slug';
+const formIMG = 'img';
+const formPrice = 'price';
+
 export default class Products extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
       list: [],
-      status: 'idle',
+      status: statusIdle,
       newProduct: {
         title: '',
         img: '',//'/public/img/product1.jpg',
@@ -20,10 +50,10 @@ export default class Products extends React.Component {
     }
 
   }
-
+//getting data from server and set status
   renderProducts () {
     this.setState(state => ({
-      status: 'pending'
+      status: statusPending
     }))
 
     return (
@@ -31,22 +61,22 @@ export default class Products extends React.Component {
         setTimeout(() => {
           resolve(fetch('/api/products')
             .then(res => {
-              if (this.props.button === 'panel' && res.status !== 200) {
-                return window.location = '/#/panel/login'
+              if (this.props.button === 'panel' && res.status !== statusCodeOK) {
+                return window.location = panelLogin
               } else {
                 return res.json()
               }
             })
             .then(list => this.setState({ list }))
             .then(() => this.setState(state => ({
-              status: 'ready'
+              status: statusReady
             })))
           )
         }, 1000)
       }).catch(error => {
         console.error(error)
         this.setState(state => ({
-          status: 'error'
+          status: statusError
         }))
       })
 
@@ -56,18 +86,18 @@ export default class Products extends React.Component {
   componentDidMount () {
     this.renderProducts()
   }
-
+//alert
   renderElement () {
-    if (this.state.status === 'ready') {
+    if (this.state.status === statusReady) {
       return (
         <div className="alert alert-primary" role="alert">
-          Товары загружены
+          {load}
         </div>
       )
-    } else if (this.state.status === 'error') {
+    } else if (this.state.status === statusError) {
       return (
         <div className="alert alert-danger" role="alert">
-          Ошибка загрузки товаров
+          {loadError}
         </div>
       )
     }
@@ -95,9 +125,9 @@ export default class Products extends React.Component {
                         <p className="card-text">{item.description}</p>
                         <p className="card-text"> Цена {item.price} руб.</p>
                         {this.props.button === 'index' ? (
-                          <Link className="btn btn-primary" to={'/product/' + item.key + '-' + item.slug}>Купить</Link>
+                          <Link className="btn btn-primary" to={'/product/' + item.key + '-' + item.slug}>{buttonBuy}</Link>
                         ) : (
-                          <Link className="btn btn-primary" to={'/panel/product/' + item._id}>Купить</Link>
+                          <Link className="btn btn-primary" to={'/panel/product/' + item._id}>{buttonUpdate}</Link>
                         )
                         }
                       </HashRouter>
@@ -105,13 +135,13 @@ export default class Products extends React.Component {
                   </React.Fragment>
                 )
               )) : (
-              this.state.status === 'error' ?
+              this.state.status === statusError ?
                 (<div>
-                    <h4> Ошибка </h4>
+                    <h4> {mistake} </h4>
                   </div>
                 ) : (
                   <div>
-                    <h4>Идет поиск товаров</h4>
+                    <h4>{search}</h4>
                   </div>
                 )
             )
@@ -128,27 +158,27 @@ export default class Products extends React.Component {
   addNewProduct () {
     return (
       <form>
-        <p><h2>Добавление нового товара</h2></p>
+        <p><h2>{caption}</h2></p>
         <div className="form-group">
-          <p><label htmlFor="formGroupExampleInput">Введите новое наименование товара</label></p>
-          <input placeholder={this.state.newProduct.title} name="title" type="text" className="form-control"
-                 id="title"
+          <p><label htmlFor={formTitle}>{labelTitle}</label></p>
+          <input placeholder={this.state.newProduct.title} name={formTitle} type="text" className="form-control"
+                 id={formTitle}
                  value={this.state.newProduct.title}
                  onChange={this.onChange.bind(this)}></input>
         </div>
         <div className="form-group">
-          <p><label htmlFor="formGroupExampleInput">Введите новый путь к изображению товара</label></p>
-          <input placeholder={this.state.newProduct.img} name="img" type="text" className="form-control"
-                 id="img"
+          <p><label htmlFor={formIMG}>{labelIMG}</label></p>
+          <input placeholder={this.state.newProduct.img} name={formIMG} type="text" className="form-control"
+                 id={formIMG}
                  value={this.state.newProduct.img}
                  onChange={this.onChange.bind(this)}></input>
         </div>
 
         <div className="form-group">
-          <p><label htmlFor="exampleFormControlTextarea1">Введите новое краткое описание товара</label></p>
+          <p><label htmlFor={formDescription}>{labelDescription}</label></p>
           <textarea placeholder={this.state.newProduct.description}
-                    name="description" className="form-control"
-                    id="description"
+                    name={formDescription} className="form-control"
+                    id={formDescription}
                     rows="2"
                     value={this.state.newProduct.description}
                     onChange={this.onChange.bind(this)}></textarea>
@@ -156,32 +186,32 @@ export default class Products extends React.Component {
 
 
         <div className="form-group">
-          <p><label htmlFor="exampleFormControlTextarea1">Введите новое полное описание товара</label></p>
+          <p><label htmlFor={formDescriptionFull}>{labelDescriptionFull}</label></p>
           <textarea placeholder={this.state.newProduct.descriptionFull}
-                    name="descriptionFull" className="form-control"
-                    id="descriptionFull"
+                    name= {formDescriptionFull} className="form-control"
+                    id= {formDescriptionFull}
                     rows="3"
                     value={this.state.newProduct.descriptionFull}
                     onChange={this.onChange.bind(this)}></textarea>
         </div>
         <div className="form-group">
-          <p><label htmlFor="formGroupExampleInput">Введите цену товара (только число)</label></p>
-          <input placeholder={this.state.newProduct.price} name="price" type="text" className="form-control"
-                 id="price"
+          <p><label htmlFor={formPrice}>{labelPrice}</label></p>
+          <input placeholder={this.state.newProduct.price} name={formPrice} type="text" className="form-control"
+                 id={formPrice}
                  value={this.state.newProduct.price}
                  onChange={this.onChange.bind(this)}></input>
         </div>
         <div className="form-group">
-          <p><label htmlFor="formGroupExampleInput">Введите числовой ключ товара</label></p>
-          <input placeholder={this.state.newProduct.key} name="key" type="text" className="form-control"
-                 id="key"
+          <p><label htmlFor= {formKey}>{labelKey}</label></p>
+          <input placeholder={this.state.newProduct.key} name= {formKey} type="text" className="form-control"
+                 id= {formKey}
                  value={this.state.newProduct.key}
                  onChange={this.onChange.bind(this)}></input>
         </div>
         <div className="form-group">
-          <label htmlFor="formGroupExampleInput">Введите ключевое наименование товара</label>
-          <input placeholder={this.state.newProduct.slug} name="slug" type="text" className="form-control"
-                 id="slug"
+          <label htmlFor= {formSlug}> {labelSlug}</label>
+          <input placeholder={this.state.newProduct.slug} name= {formSlug} type="text" className="form-control"
+                 id={formSlug}
                  value={this.state.newProduct.slug}
                  onChange={this.onChange.bind(this)}></input>
         </div>
@@ -243,25 +273,25 @@ export default class Products extends React.Component {
     event.stopPropagation()
     const name = event.target.name
     switch (name) {
-      case 'title':
+      case formTitle:
         this.state.newProduct.title = event.target.value
         break
-      case 'img':
+      case formIMG:
         this.state.newProduct.img = event.target.value
         break
-      case 'description':
+      case formDescription:
         this.state.newProduct.description = event.target.value
         break
-      case 'descriptionFull':
+      case formDescriptionFull:
         this.state.newProduct.descriptionFull = event.target.value
         break
-      case 'key' :
+      case formKey :
         this.state.newProduct.key = event.target.value
         break
-      case 'price' :
+      case formPrice :
         this.state.newProduct.price = event.target.value
         break
-      case 'slug' :
+      case formSlug :
         this.state.newProduct.slug = event.target.value
         break
       default :

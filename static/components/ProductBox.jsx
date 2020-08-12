@@ -3,13 +3,39 @@ import Breadcrumb from './Breadcrumb'
 import { HashRouter } from 'react-router-dom'
 
 let path
+const statusIdle = 'idle';
+const statusPending = 'pending';
+const statusReady ='ready'
+const statusError ='error'
+const statusCodeOK = 200;
+const apiKey = '/api/product?key=';
+const apiID = '/api/product?id=';
+const apiDefault = '/api/product?slug=bag';
+const panelLogin = '/#/panel/login';
+const buttonBuy = 'Купить';
+const buttonUpdate = 'Изменить';
+const buttonSave = 'Сохранить';
+const labelTitle = 'Введите новое наименование товара';
+const labelDescription = 'Введите новое полное описание товара';
+const labelKey = 'Введите числовой ключ товара';
+const labelSlug = 'Введите ключевое наименование товара';
+const mistake = 'Ошибка';
+const search ='Идет поиск товара';
+const load =  'Товары загружены';
+const loadError = 'Ошибка загрузки товаров';
+const formTitle = 'title';
+const formDescriptionFull = 'descriptionFull';
+const formKey = 'key';
+const formSlug = 'slug';
+
+
 
 export default class Products extends React.Component {
 
   constructor (props) {
     super(props)
     this.state = {
-      status: 'idle',
+      status: statusIdle,
       products: [],
       beforeTitle: '',
       item: {
@@ -21,18 +47,18 @@ export default class Products extends React.Component {
     }
     this.getPath()
   }
-
+//getting path for getting data from fetch
   getPath () {
     if (this.props.prodKey !== undefined && this.props.prodKey !== null) {
-      path = '/api/product?key=' + this.props.prodKey
+      path = apiKey + this.props.prodKey;
     } else if (this.props.prodId !== undefined && this.props.prodId !== null) {
-      path = '/api/product?id=' + this.props.prodId
+      path = apiID + this.props.prodId;
     } else {
-      path = '/api/product?slug=bag'
+      path = apiDefault;
     }
 
   }
-
+//rendering data without updating
   getProducts (products) {
     return (
       <React.Fragment>
@@ -43,7 +69,7 @@ export default class Products extends React.Component {
                 <img className="card-img-top" src={item.img} alt="img"></img>
                 <p className="card-text">{item.descriptionFull}</p>
                 <p className="card-text"> Цена {item.price} руб.</p>
-                <a href="#" className="btn btn-primary">Купить</a>
+                <a href="#" className="btn btn-primary">{buttonBuy}</a>
               </React.Fragment>
             )
           )) : (this.getErrorElement())
@@ -53,7 +79,7 @@ export default class Products extends React.Component {
       </React.Fragment>
     )
   }
-
+//send and get updated data
   onSave (event) {
     event.preventDefault()
     event.stopPropagation()
@@ -66,8 +92,8 @@ export default class Products extends React.Component {
         'Content-Type': 'application/json'
       }
     }).then(res => {
-      if (res.status !== 200) {
-        return window.location = '/#/panel/login'
+      if (res.status !== statusCodeOK) {
+        return window.location = panelLogin
       } else {
         return res.json()
       }
@@ -81,22 +107,22 @@ export default class Products extends React.Component {
       })
 
   }
-
+//changing data on a form
   onChange (event) {
     event.preventDefault()
     event.stopPropagation()
     const name = event.target.name
     switch (name) {
-      case 'title':
+      case formTitle:
         this.state.item.title = event.target.value
         break
-      case 'descriptionFull':
+      case formDescriptionFull:
         this.state.item.descriptionFull = event.target.value
         break
-      case 'key' :
+      case formKey :
         this.state.item.key = event.target.value
         break
-      case 'slug' :
+      case formSlug :
         this.state.item.slug = event.target.value
         break
       default :
@@ -106,6 +132,7 @@ export default class Products extends React.Component {
     this.forceUpdate()
   }
 
+//rendering data for updating
   renderForm (products) {
     return (
       <React.Fragment>
@@ -115,42 +142,42 @@ export default class Products extends React.Component {
               <React.Fragment key={index}>
                 <form>
                   <div className="form-group">
-                    <p><label htmlFor="formGroupExampleInput">{item.title}</label></p>
-                    <p><label htmlFor="formGroupExampleInput">Введите новое наименование товара</label></p>
-                    <input placeholder={item.title} name="title" type="text" className="form-control"
-                           id="title"
+                    <p><label htmlFor={formTitle}>{item.title}</label></p>
+                    <p><label htmlFor={formTitle}>{labelTitle}</label></p>
+                    <input placeholder={item.title} name={formTitle} type="text" className="form-control"
+                           id={formTitle}
                            value={this.state.item.title}
                            onChange={this.onChange.bind(this)}></input>
                   </div>
                   <h5 className="card-title">{this.state.item.title}</h5>
                   <img className="card-img-top" src={item.img} alt="img"></img>
                   <div className="form-group">
-                    <p><label htmlFor="exampleFormControlTextarea1">Введите новое полное описание товара</label></p>
+                    <p><label htmlFor={formDescriptionFull}>{labelDescription}</label></p>
                     <textarea placeholder={item.descriptionFull}
-                              name="descriptionFull" className="form-control"
-                              id="descriptionFull"
+                              name={formDescriptionFull} className="form-control"
+                              id={formDescriptionFull}
                               rows="3"
                               value={this.state.item.descriptionFull}
                               onChange={this.onChange.bind(this)}></textarea>
                   </div>
                   <p className="card-text"> Цена {item.price} руб.</p>
                   <div className="form-group">
-                    <p><label htmlFor="formGroupExampleInput">Введите числовой ключ товара</label></p>
-                    <input placeholder={item.key} name="key" type="text" className="form-control"
-                           id="key"
+                    <p><label htmlFor={formKey}>{labelKey}</label></p>
+                    <input placeholder={item.key} name= {formKey} type="text" className="form-control"
+                           id={formKey}
                            value={this.state.item.key}
                            onChange={this.onChange.bind(this)}></input>
                   </div>
                   <div className="form-group">
-                    <label htmlFor="formGroupExampleInput">Введите ключевое наименование товара</label>
-                    <input placeholder={item.slug} name="slug" type="text" className="form-control"
-                           id="slug"
+                    <label htmlFor={formSlug}>{labelSlug}</label>
+                    <input placeholder={item.slug} name={formSlug} type="text" className="form-control"
+                           id={formSlug}
                            value={this.state.item.slug}
                            onChange={this.onChange.bind(this)}></input>
                   </div>
-                  <p><a href="#" className="btn btn-primary">Купить</a></p>
+                  <p><a href="#" className="btn btn-primary">{buttonUpdate}</a></p>
                   <p>
-                    <button onClick={this.onSave.bind(this)} type="button" className="btn btn-success">Сохранить
+                    <button onClick={this.onSave.bind(this)} type="button" className="btn btn-success">{buttonSave}
                     </button>
                   </p>
                 </form>
@@ -164,26 +191,27 @@ export default class Products extends React.Component {
   }
 
   getErrorElement () {
-    return this.state.status === 'error' ?
+    return this.state.status ===  statusError ?
       (<div>
-          <h4> Ошибка </h4>
+          <h4> {mistake} </h4>
         </div>
       ) : (
         <div>
-          <h4>Идет поиск товара</h4>
+          <h4>{search}</h4>
         </div>
       )
   }
 
+ // getting data from server and set status
   renderProduct () {
     this.setState(state => ({
-      status: 'pending'
+      status: statusPending
     }))
     return (
       fetch(path)
         .then(res => {
-          if (path.startsWith('/api/product?id=') && res.status !== 200) {
-            return window.location = '/#/panel/login'
+          if (path.startsWith(apiID) && res.status !== statusCodeOK) {
+            return window.location = panelLogin
           } else {
             return res.json()
           }
@@ -192,12 +220,12 @@ export default class Products extends React.Component {
           products: product
         })))
         .then(() => this.setState(state => ({
-          status: 'ready'
+          status: statusReady
         })))
         .catch(error => {
           console.error(error)
           this.setState(state => ({
-            status: 'error'
+            status: statusError
           }))
         })
     )
@@ -212,18 +240,18 @@ export default class Products extends React.Component {
   componentDidMount () {
     this.renderProduct()
   }
-
+//alert
   renderElement () {
-    if (this.state.status === 'ready') {
+    if (this.state.status === statusReady) {
       return (
         <div className="alert alert-primary" role="alert">
-          Товары загружены
+          {load}
         </div>
       )
-    } else if (this.state.status === 'error') {
+    } else if (this.state.status === statusError) {
       return (
         <div className="alert alert-danger" role="alert">
-          Ошибка загрузки товаров
+          {loadError}
         </div>
       )
     }

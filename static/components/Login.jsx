@@ -1,8 +1,27 @@
 import React from 'react'
 import Breadcrumb from './Breadcrumb'
-/*import jwt from 'jsonwebtoken'*/
 const Cookie = require('cookie')
 import decode from 'jwt-decode'
+
+const path = '/api/login/'
+const authSuccessful = 'Авторизация успешна';
+const authFailed = 'Ошибка авторизации. Введите логин и пароль еще раз.'
+const statusIdle = 'idle';
+const statusPending = 'pending';
+const statusLogged = 'logged';
+const statusError = 'error';
+const caption = 'Авторизация';
+const login = 'admin@mail.con';
+const password = '123456';
+const millisecondsToSeconds = 1000;
+const statusCodeOK = 200;
+const labelEmail = 'E-mail';
+const labelPassword = 'Пароль';
+const buttonIn = 'Войти';
+const buttonOut = 'Выйти';
+const cookieClear = 'token=; Path=/; Max-Age=0;'
+const formLogin = 'login';
+const formPassword = 'password';
 
 export default class Login extends React.Component {
 
@@ -11,8 +30,8 @@ export default class Login extends React.Component {
     this.state = {
       status: this.checkCookie(),
       credentials: {
-        login: 'admin@mail.con',
-        password: '123456'
+        login: login,
+        password: password
       }
     }
 
@@ -22,16 +41,15 @@ export default class Login extends React.Component {
     try {
       const cookies = Cookie.parse(document.cookie);
       const payload = decode(cookies.token);
-      // const payload = jwt.decode(cookies.token)
       const timestampInMilliseconds = new Date().getTime();
-      const exp = (timestampInMilliseconds / 1000) < payload.exp;
+      const exp = (timestampInMilliseconds / millisecondsToSeconds) < payload.exp;
       if (exp) {
-        return 'logged';
+        return  statusLogged;
       } else {
-        return 'idle';
+        return statusIdle;
       }
     } catch (e) {
-      return 'idle';
+      return statusIdle;
     }
   }
 
@@ -39,9 +57,10 @@ export default class Login extends React.Component {
     event.preventDefault()
     event.stopPropagation()
     this.setState(state => ({
-      status: 'pending'
+      status: statusPending
     }))
-    fetch(`/api/login/`, {
+    //sending request to auth, response - status code
+    fetch(path, {
       method: 'post',
       credentials: 'same-origin',
       body: JSON.stringify(this.state.credentials),
@@ -49,34 +68,34 @@ export default class Login extends React.Component {
         'Content-Type': 'application/json'
       }
     }).then(res => {
-      return /*res.json()*/ res.status
+      return res.status
     }).then(status => {
-      if( status === 200){
+      if( status === statusCodeOK){
         this.setState(() => ({
-          status: 'logged'
+          status:  statusLogged
         }))
       } else{
         this.setState(() => ({
-          status: 'error'
+          status: statusError
         }))
       }
 
     }).catch(error => {
       this.setState(() => ({
-        status: 'error'
+        status: statusError
       }))
     })
   }
-
+//changing data on a form
   onChange (event) {
     event.preventDefault()
     event.stopPropagation()
     const name = event.target.name
     switch (name) {
-      case 'login':
+      case formLogin:
         this.state.credentials.login = event.target.value
         break
-      case 'password':
+      case formPassword:
         this.state.credentials.password = event.target.value
         break
 
@@ -86,28 +105,28 @@ export default class Login extends React.Component {
 
     this.forceUpdate()
   }
-
+//exit authorization using the button
   onGoOut (event) {
     event.preventDefault()
     event.stopPropagation()
-    document.cookie = 'token=; Path=/; Max-Age=0;'
+    document.cookie = cookieClear
     this.setState(() => ({
-      status: 'igle'
+      status: statusIdle
     }))
     this.forceUpdate()
   }
-
+//alert
   renderElement () {
-    if (this.state.status === 'logged') {
+    if (this.state.status ===  statusLogged) {
       return (
         <div className="alert alert-success" role="alert">
-          Авторизация успешна
+          {authSuccessful}
         </div>
       )
-    } else if (this.state.status === 'error') {
+    } else if (this.state.status === statusError) {
       return (
         <div className="alert alert-danger" role="alert">
-          Ошибка авторизации. Введите логин и пароль еще раз.
+          {authFailed}
         </div>
       )
     }
@@ -115,7 +134,7 @@ export default class Login extends React.Component {
   }
 
   render () {
-    if (this.state.status !== 'logged') {
+    if (this.state.status !==  statusLogged) {
       return this.getLoginForm()
     } else {
       return (
@@ -125,7 +144,7 @@ export default class Login extends React.Component {
               <div className="content">
                 <Breadcrumb/>
                 <div> {this.renderElement()}</div>
-                <button className="btn btn-primary" onClick={this.onGoOut.bind(this)}>Выйти</button>
+                <button className="btn btn-primary" onClick={this.onGoOut.bind(this)}>{buttonOut}</button>
               </div>
             </div>
           </div>
@@ -147,22 +166,22 @@ export default class Login extends React.Component {
               }
               </div>
               <form>
-                <h2>Авторизация</h2>
+                <h2>{caption}</h2>
                 <div className="form-group">
-                  <label htmlFor="login">E-mail</label>
-                  <input placeholder='login' name="login" type="text" className="form-control"
-                         id="login"
+                  <label htmlFor={formLogin}>{labelEmail}</label>
+                  <input placeholder= {formLogin} name= {formLogin} type="text" className="form-control"
+                         id={formLogin}
                          value={this.state.credentials.login}
                          onChange={this.onChange.bind(this)}></input>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="password">Пароль</label>
-                  <input type="password" className="form-control" id="password" type="text"
-                         value={this.state.credentials.password} placeholder="password"
+                  <label htmlFor={formPassword}>{labelPassword}</label>
+                  <input type={formPassword} className="form-control" id= {formPassword} type="text"
+                         value={this.state.credentials.password} placeholder={formPassword}
                          onChange={this.onChange.bind(this)}></input>
                 </div>
                 <p>
-                  <button type="button" className="btn btn-primary" onClick={this.onGetAuth.bind(this)}>Войти
+                  <button type="button" className="btn btn-primary" onClick={this.onGetAuth.bind(this)}>{buttonIn}
                   </button>
                 </p>
               </form>

@@ -2,6 +2,12 @@ const mongodb = require('mongodb');
 const MongoClient = mongodb.MongoClient;
 const lodash = require('lodash');
 let url = 'mongodb://localhost:27017';
+const db = 'shop';
+const collectionProduct = 'product';
+const collectionUser = 'user';
+const messageGet = 'Получены данные';
+
+
 module.exports = {
 
   updateProduct: function (id, patch) {
@@ -14,8 +20,8 @@ module.exports = {
             reject(err);
           }
           client
-            .db('shop')
-            .collection('product')
+            .db(db)
+            .collection(collectionProduct)
             .findOneAndUpdate(
               { _id: mongodb.ObjectID(id) },
               {
@@ -47,15 +53,15 @@ module.exports = {
             reject(err);
           }
           client
-            .db('shop')
-            .collection('product')
+            .db(db)
+            .collection(collectionProduct)
             .find({ _id: mongodb.ObjectID(productId) }).toArray(
             function (err, results) {
               if (err) {
                 console.log(err.message());
                 reject(err);
               }
-              console.log('Получены данные');
+              console.log(messageGet);
               console.log(results);
               client.close();
               resolve(results);
@@ -80,15 +86,15 @@ module.exports = {
             reject(err);
           }
           client
-            .db('shop')
-            .collection('product')
+            .db(db)
+            .collection(collectionProduct)
             .find(where).toArray(
             (function (err, results) {
               if (err) {
                 console.log(err.message());
                 reject(err);
               }
-              console.log('Получены данные');
+              console.log(messageGet);
               console.log(results);
               client.close();
               resolve(results);
@@ -154,15 +160,15 @@ module.exports = {
             reject(err);
           }
           client
-            .db('shop')
-            .collection('product')
+            .db(db)
+            .collection(collectionProduct)
             .find()
             .sort({ key: 1 })
             .toArray(function (err, results) {
               if (err) {
                 reject(err);
               }
-              console.log('Получены данные');
+              console.log(messageGet);
               console.log(results);
               if (results.length === 0) {
                 createDB(client.db('shop').collection('product'));
@@ -184,8 +190,8 @@ module.exports = {
             reject(err);
           }
           client
-            .db('shop')
-            .collection('product')
+            .db(db)
+            .collection(collectionProduct)
             .insertOne(
               body, {},
               function (err, results) {
@@ -235,15 +241,15 @@ module.exports = {
             reject(err);
           }
           client
-            .db('shop')
-            .collection('user')
+            .db(db)
+            .collection(collectionUser)
             .find()
             .sort({ key: 1 })
             .toArray(function (err, results) {
               if (err) {
                 reject(err);
               }
-              console.log('Получены данные');
+              console.log(messageGet);
               console.log(results);
               if (results.length === 0) {
                 createDB(client.db('shop').collection('user'));
@@ -263,14 +269,14 @@ module.exports = {
             reject(err);
           }
           client
-            .db('shop')
-            .collection('user')
+            .db(db)
+            .collection(collectionUser)
             .findOne({ email: email },
               function (err, results) {
                 if (err) {
                   reject(err);
                 }
-                console.log('Получены данные');
+                console.log(messageGet);
                 console.log(results);
                 client.close();
                 resolve(results);
@@ -290,8 +296,8 @@ module.exports = {
             reject(err);
           }
           client
-            .db('shop')
-            .collection('user')
+            .db(db)
+            .collection(collectionUser)
             .findOneAndUpdate(
               { _id: mongodb.ObjectID(id) },
               {

@@ -7,7 +7,7 @@ export default class Nav extends React.Component {
       activeTab: -1
     }
   }
-
+//set active tab
   toggle (tabIndex) {
     event.preventDefault()
     event.stopPropagation()

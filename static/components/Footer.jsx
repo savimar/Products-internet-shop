@@ -1,11 +1,13 @@
 import React from 'react'
 
+const year = '2020'
+const copyright = '&#169; СCodery.camp' + year
 export default class Footer extends React.Component {
   render () {
     return (
       <footer>
         <div>
-          &#169; {/*&copy*/} СCodery.camp 2020
+          {copyright}
         </div>
       </footer>
     )
