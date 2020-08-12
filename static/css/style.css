@@ -22,7 +22,8 @@ body {
 .box {
     width: 80%;
     margin-left: auto;
-    margin-right: auto
+    margin-right: auto;
+
 }
 
 
@@ -31,6 +32,7 @@ body {
     margin-right: auto;
     margin-top: 5%;
     margin-bottom: 7%;
+    display: inline-block;
 }
 
 
@@ -40,11 +42,15 @@ body {
 }
 
 
-header {
+.header {
     background-color: Black;
     font-size: 0;
 }
 
+.headerPanel {
+    background-color: Green;
+    font-size: 0;
+}
 
 .menu a {
     line-height: 50px;
@@ -52,7 +58,6 @@ header {
     font-family: Verdana, sans-serif;
     font-size: 14px;
     padding: 0 20px;
-
 }
 
 a {
@@ -90,6 +95,16 @@ a:hover {
     color: LightGreen;
 }
 
+nav.breadcrumb {
+    margin-bottom: 0;
+}
+
+nav a.breadcrumb-item {
+    color: #007bff;
+    padding: 0;
+    font-weight: bolder;
+}
+
 
 main {
     background-color: #cbcbcb;
@@ -102,8 +117,8 @@ main {
 main .content {
     background-color: White;
     padding: 25px;
-    min-height: calc(100vh - 180px);
-    max-height: calc(100vh - 40px);
+    /*min-height: calc(100vh - 145px);
+    max-height: calc(100vh - 15px);*/
 }
 
 .title {
@@ -138,6 +153,7 @@ main .content {
 
 .card-text {
     margin-top: 5%;
+    align-content: center;
 }
 
 footer {
@@ -147,7 +163,7 @@ footer {
     padding-top: 20px;
     padding-bottom: 35px;
     padding-left: 0;
-    height: 30px;
+    height: 15px;
     font-family: Verdana, sans-serif;
     font-size: 14px;
     font-weight: bolder;
